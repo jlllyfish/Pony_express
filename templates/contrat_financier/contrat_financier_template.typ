@@ -33,6 +33,8 @@
   compagnie_assurance: missing_data,
   numero_assurance: missing_data,
   police_assurance: missing_data,
+  option_prise_en_charge: missing_data,
+  inclut_dans_contribution: (),
   ..superfluous_arguments
  ) = [
 

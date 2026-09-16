@@ -1,12 +1,13 @@
 import pathlib
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 
 
 def get_date_from_timestamp(str_timestamp: str) -> str:
     if isinstance(str_timestamp, list):
         str_timestamp = _parse_grist_date_data(str_timestamp)
     timestamp = int(str_timestamp)
-    date = datetime.fromtimestamp(timestamp)
+    # dates Grist = minuit UTC ; fromtimestamp() plante sous Windows avant 1970
+    date = datetime(1970, 1, 1, tzinfo=timezone.utc) + timedelta(seconds=timestamp)
     return date.strftime("%d-%m-%y")
 
 def _parse_grist_date_data(grist_date: list[str]) -> str:

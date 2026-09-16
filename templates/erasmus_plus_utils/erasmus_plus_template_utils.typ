@@ -131,6 +131,7 @@
 ////////////
 
 #let erasmus_plus_layout(title: "", translation: "", activate_translation: true, doc) = {
+  set text(font: "Marianne")
   
   let moow_logo = image("assets/header_logo.png",
   alt: "Move occitanie over the world by ENSFEA")

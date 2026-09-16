@@ -16,7 +16,7 @@
   "Acquis d’apprentissage": "Learning outcomes",
   "Année scolaire": "School year",
   "Agent": "Agent",
-  "08 – Agriculture, forestry, fisheries and veterinary" : ""
+  "08 – Agriculture, forestry, fisheries and veterinary" : "",
   "Apprenant": "Learner",
   "attestation de stage" : "traineeship certificate",
   "Contexte d’apprentissage": "Learning context",

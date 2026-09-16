@@ -108,24 +108,24 @@ def apply_data_transformation(data: dict) -> dict:
 
 
 def get_accompagnants(data: dict) -> list[dict]:
-    return [{'name': "",
-        'firstname': "",
+    return [{'nom': "",
+        'prenom': "",
         'email': "",
-        'phone': "",
+        'telephone': "",
         'responsabilites': ""}]
 
 def get_responsables_envoi(data: dict) -> list[dict]:
-    return [{'name': "",
-        'firstname': "",
+    return [{'nom': "",
+        'prenom': "",
         'email': "",
-        'phone': "",
+        'telephone': "",
         'responsabilites': ""}]
 
 def get_responsables_accueil(data: dict) -> list[dict]:
-    return [{'name': "",
-        'firstname': "",
+    return [{'nom': "",
+        'prenom': "",
         'email': "",
-        'phone': "",
+        'telephone': "",
         'responsabilites': ""}]
 
 

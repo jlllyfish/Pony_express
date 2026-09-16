@@ -6,3 +6,4 @@ generated/
 shell.nix
 
 .idea/
+__pycache__/

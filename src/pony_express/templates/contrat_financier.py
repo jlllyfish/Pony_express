@@ -74,6 +74,9 @@ def apply_data_transformation(dict) -> dict:
     transformed_dict = deepcopy(dict)
     transformed_dict[PERSON_DATA.participant_date_naissance.name] = get_date_from_timestamp(dict[PERSON_DATA.participant_date_naissance.name])
     transformed_dict[PERSON_DATA.participant_nom_complet.name] = dict[PERSON_DATA.participant_prenom.name] + " " + dict[PERSON_DATA.participant_nom.name]
+    # le template attend un tableau : colonne Grist "Choice List" -> ["L", "frais_voyage", ...]
+    contribution = dict[PERSON_DATA.inclut_dans_contribution.name]
+    transformed_dict[PERSON_DATA.inclut_dans_contribution.name] = contribution[1:] if isinstance(contribution, list) else []
     return transformed_dict
 
 if __name__ == '__main__':
