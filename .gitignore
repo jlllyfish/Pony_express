@@ -7,3 +7,4 @@ shell.nix
 
 .idea/
 __pycache__/
+.venv/

@@ -66,7 +66,7 @@ def should_be_exported(record) -> bool:
     return True
 
 def name_pdf(record) -> str:
-    return slugify(record[PERSON_DATA.participant_nom.name]+"_financier")
+    return slugify(f"{record[PERSON_DATA.participant_nom.name]}_{record[PERSON_DATA.participant_prenom.name]}_{record['id']}_financier")
 
 # Can be used to add any treatment of the data exported from grist
 # for instance, date format, address validation etc...

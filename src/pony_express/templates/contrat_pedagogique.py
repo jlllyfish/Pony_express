@@ -51,14 +51,14 @@ class STUDENT_DATA(Enum):
   participant_telephone = "telephone_participant"
   participant_qualification = not_in_grist("participant_qualification") # MISSING
   participant_niveau_cerp = not_in_grist("participant_niveau_cerp") # MISSING
-  tuteur_1_nom = "Nom Parent -tuteur légal 1"
-  tuteur_1_prenom = "Prénom Parent -tuteur légal 1"
-  tuteur_1_email = "Mail Parent -tuteur légal 1"
-  tuteur_1_telephone = "Téléphone Parent -tuteur légal 1"
-  tuteur_2_nom = "Nom Parent -tuteur légal 2"
-  tuteur_2_prenom = "Prénom Parent -tuteur légal 2"
-  tuteur_2_email = "Mail Parent -tuteur légal 2"
-  tuteur_2_telephone = "Téléphone Parent -tuteur légal 2"
+  tuteur_1_nom = "nom_parent_tuteur_legal_1"
+  tuteur_1_prenom = "prenom_parent_tuteur_legal_1"
+  tuteur_1_email = "mail_parent_tuteur_legal_1"
+  tuteur_1_telephone = "telephone_parent_tuteur_legal_1"
+  tuteur_2_nom = "nom_parent_tuteur_legal_2"
+  tuteur_2_prenom = "prenom_parent_tuteur_legal_2"
+  tuteur_2_email = "mail_parent_tuteur_legal_2"
+  tuteur_2_telephone = "telephone_parent_tuteur_legal_2"
   tuteurs_legaux = not_in_grist("tuteurs_legaux") #Computed from others data
   organisation_envoi_nom = not_in_grist("organisation_envoi_nom")  # MISSING
   organisation_envoi_adresse = not_in_grist("organisation_envoi_adresse")  # MISSING
@@ -86,7 +86,7 @@ def should_be_exported(record: dict) -> bool:
         return False
 
 def name_pdf(record) -> str:
-    return slugify(record[STUDENT_DATA.participant_nom.name]+"_pedagogique")
+    return slugify(f"{record[STUDENT_DATA.participant_nom.name]}_{record[STUDENT_DATA.participant_prenom.name]}_{record['id']}_pedagogique")
 
 
 """
