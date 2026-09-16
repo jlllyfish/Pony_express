@@ -56,6 +56,9 @@ def typst_params(typ_file: Path, func: str) -> tuple[dict[str, str], bool]:
         if c == '"' and src[i - 1] != "\\":
             in_str = not in_str
         if not in_str:
+            if src.startswith("//", i):  # commentaire : ignoré jusqu'à la fin de ligne
+                i = src.find("\n", i)
+                continue
             if c in "([{":
                 depth += 1
             elif c in ")]}":
