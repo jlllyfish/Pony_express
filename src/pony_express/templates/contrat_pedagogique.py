@@ -25,6 +25,7 @@ DEMARCHE = "128447"
 TABLE_CHAMPS = f"Demarche_{DEMARCHE}_champs"
 TABLE_ACQUIS = f"Demarche_{DEMARCHE}_repetable_acquis_d_apprentissage"
 TABLE_ACTIVITES = f"Demarche_{DEMARCHE}_repetable_activites_et_taches"
+TABLE_ACCOMPAGNATEURS = f"Demarche_{DEMARCHE}_repetable_information_personnelle_accompagnateur"
 BLOCK_KEY = "dossier_number"  # numéro de dossier dans les tables de blocs
 BLOCK_ORDER = "block_row_index"  # ordre des blocs
 # colonnes attendues dans chaque table (contrôlées par check_mapping.py)
@@ -36,6 +37,17 @@ EXTRA_TABLES = {
         "activite",
         "tutorat_et_suivi_de_cette_activite",
     ],
+    TABLE_ACCOMPAGNATEURS: [BLOCK_KEY, BLOCK_ORDER, "nom", "prenom", "adresse_electronique",
+                            "numero_de_telephone", "fonction"],
+}
+
+# champ du PDF -> colonne de TABLE_ACCOMPAGNATEURS
+ACCOMPAGNATEUR_COLUMNS = {
+    "nom": "nom",
+    "prenom": "prenom",
+    "email": "adresse_electronique",
+    "telephone": "numero_de_telephone",
+    "responsabilites": "fonction",
 }
 
 
@@ -145,7 +157,9 @@ def apply_data_transformation(data: dict) -> dict:
         STUDENT_DATA.tutorings.name,
         [b.get("tutorat_et_suivi_de_cette_activite") for b in activites],
     )
-    transformed_dict[STUDENT_DATA.accompagnants.name] = get_accompagnants(data)
+    set_people(transformed_dict, STUDENT_DATA.accompagnants.name,
+               get_blocks(TABLE_ACCOMPAGNATEURS, data[STUDENT_DATA.numero_dossier.name]),
+               ACCOMPAGNATEUR_COLUMNS)
     transformed_dict[STUDENT_DATA.responsables_envoi.name] = get_responsables_envoi(
         data
     )
@@ -192,11 +206,14 @@ def set_list(data: dict, key: str, values: list) -> None:
         data.pop(key, None)
 
 
-def get_accompagnants(data: dict) -> list[dict]:
-    return [
-        {"nom": "", "prenom": "", "email": "", "telephone": "", "responsabilites": ""}
-    ]
-
+def set_people(data: dict, key: str, blocks: list[dict], columns: dict[str, str]) -> None:
+    """Une fiche par bloc (champ du PDF -> colonne Grist) ; sans bloc : [donnee manquante]."""
+    people = [{field: clean_text(block.get(column)) for field, column in columns.items()} for block in blocks]
+    people = [person for person in people if any(person.values())]
+    if people:
+        data[key] = people
+    else:
+        data.pop(key, None)
 
 def get_responsables_envoi(data: dict) -> list[dict]:
     return [
