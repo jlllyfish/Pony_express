@@ -6,12 +6,15 @@ Usage :
     poetry run python check_mapping.py contrat_pedagogique --compile --limit 3
     poetry run python check_mapping.py contrat_financier --records exemple.json --compile
 
---records : JSON (liste de dicts indexés par ID de colonne Grist) pour tester sans Grist.
+--records : CSV ou JSON de la table principale (ID de colonnes Grist) pour tester sans Grist.
+--table NOM=FICHIER : en hors-ligne, contenu (CSV ou JSON) d'une table annexe (EXTRA_TABLES).
 Rien n'est jamais renvoyé vers Grist.
 """
 import argparse
+import csv
 import difflib
 import importlib
+import io
 import json
 import os
 import re
@@ -82,6 +85,15 @@ def typst_params(typ_file: Path, func: str) -> tuple[dict[str, str], bool]:
 
 
 # ---------------------------------------------------------------- Helpers
+def load_file(path: Path) -> list[dict]:
+    """Lignes d'un export CSV (Grist / tableur) ou d'un JSON."""
+    if path.suffix.lower() == ".json":
+        return json.loads(path.read_text(encoding="utf-8"))
+    text = path.read_text(encoding="utf-8-sig")
+    dialect = csv.Sniffer().sniff(text[:4096], delimiters=",;\t")
+    return list(csv.DictReader(io.StringIO(text), dialect=dialect))
+
+
 def find_enum(mod) -> EnumType:
     enums = [v for v in vars(mod).values()
              if isinstance(v, EnumType) and issubclass(v, Enum) and v is not Enum
@@ -117,6 +129,8 @@ def main():
     ap.add_argument("config", help="nom du module dans src/pony_express/templates (ex: contrat_pedagogique)")
     ap.add_argument("--records", help="JSON de lignes Grist (mode hors-ligne)")
     ap.add_argument("--limit", type=int, default=5, help="nb de lignes testées (défaut 5, 0 = toutes)")
+    ap.add_argument("--table", action="append", default=[], metavar="NOM=FICHIER",
+                    help="hors-ligne : contenu CSV/JSON d'une table annexe (répétable)")
     ap.add_argument("--compile", action="store_true", help="génère les .typ et PDF dans generated/_check/")
     args = ap.parse_args()
 
@@ -161,7 +175,7 @@ def main():
     # 3. Colonnes Grist -------------------------------------------------
     title("3. Colonnes Grist")
     if args.records:
-        raw_records = json.loads(Path(args.records).read_text(encoding="utf-8"))
+        raw_records = load_file(Path(args.records))
         col_ids = set().union(*(r.keys() for r in raw_records)) - {"id"}
         labels = {}
         print(f"  (hors-ligne : colonnes déduites de {args.records})")
@@ -192,6 +206,42 @@ def main():
         fail(f"{m.name} = '{m.value}' : colonne introuvable{hint}")
     if not bad:
         ok("Toutes les colonnes mappées existent")
+
+    # 3b. Tables annexes (blocs répétables) ------------------------------
+    extra_tables = getattr(mod, "EXTRA_TABLES", {})
+    if extra_tables:
+        title("3b. Tables annexes")
+        offline_tables = {}
+        for spec in args.table:
+            name, _, path = spec.partition("=")
+            offline_tables[name] = load_file(Path(path))
+        for table, required in extra_tables.items():
+            if args.records:
+                rows = offline_tables.get(table)
+                if rows is None:
+                    warn(f"{table} : pas de --table fourni -> considérée vide")
+                    rows = []
+                cols = set().union(*(r.keys() for r in rows)) if rows else set(required)
+            else:
+                st, info = svc.grist.list_cols(table, hidden=True)
+                if st != 200:
+                    fail(f"{table} : table introuvable (HTTP {st})")
+                    continue
+                cols = {c["id"] for c in info}
+                rows = svc.get_table_records(table)
+            absent = [c for c in required if c not in cols]
+            if absent:
+                fail(f"{table} : colonnes introuvables {absent}"
+                     + "".join(f" (proche de {difflib.get_close_matches(a, list(cols), n=1)})" for a in absent
+                               if difflib.get_close_matches(a, list(cols), n=1)))
+            else:
+                key = getattr(mod, "BLOCK_KEY", None)
+                nb = len({r.get(key) for r in rows}) if key else "?"
+                ok(f"{table} : {len(rows)} lignes, {nb} dossiers")
+            if args.records and hasattr(mod, "fetch_table"):
+                offline_tables.setdefault(table, rows)
+        if args.records and hasattr(mod, "fetch_table"):
+            mod.fetch_table = lambda t: offline_tables.get(t, [])
 
     # 4. Données transformées -------------------------------------------
     title("4. Lignes exportées + apply_data_transformation")
@@ -238,7 +288,10 @@ def main():
             warn(f"« xxx is not in GRIST » imprimé pour : {', '.join(empty)}")
         if nones:
             warn(f"« None » imprimé pour : {', '.join(nones)}")
-        not_given = [p for p in params if p not in t]
+        empty_lists = [k for k, d in params.items() if d.startswith("(") and not t.get(k)]
+        if empty_lists:
+            warn(f"« [donnée manquante] » imprimé pour les listes vides : {', '.join(empty_lists)}")
+        not_given = [p for p in params if p not in t and p not in empty_lists]
         if not_given:
             print(f"    défauts du template utilisés : {', '.join(not_given)}")
         results.append((rid, pdf_name, t))

@@ -40,6 +40,13 @@ class GristService():
                 grist_data.append(record_data)
         return grist_data
 
+    def get_table_records(self, table) -> list[dict]:
+        """Toutes les lignes d'une table (ex : table de blocs répétables)."""
+        status, records = self.grist.list_records(table)
+        if status != 200:
+            raise RuntimeError(f"Lecture de la table Grist '{table}' impossible : HTTP {status}")
+        return records
+
     def update_grist_data(self, table, data):
         status, response = self.grist.update_records(table, data)
         if status != 200 :
