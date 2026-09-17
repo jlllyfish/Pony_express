@@ -166,7 +166,7 @@
       v(-0.4em)
       align(right, text(9pt, header_note))
     }
-    erasmus_title(title, translation: translation)
+        align(center, erasmus_title(title, translation: translation))
   }
 
   set document(
