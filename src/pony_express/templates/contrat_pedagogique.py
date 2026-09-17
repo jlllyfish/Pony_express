@@ -1,4 +1,5 @@
 import os
+from datetime import date
 from copy import deepcopy
 from enum import Enum
 
@@ -44,6 +45,7 @@ BLOCK_ORDER = "block_row_index"  # ordre des blocs
 PRINCIPALE = {
     "numero_dossier": "dossier_number",  # relie toutes les autres tables
     "code_projet": "code_projet",
+    "participant_qualification": "qualification_apprenant",
     "participant_nom": "nom_participant",
     "participant_prenom": "prenom_s_participant",
     "participant_adresse": "adresse_participant",
@@ -110,6 +112,19 @@ REFERENCES = {
     },
 }
 
+def annee_scolaire_courante(bascule_mois: int = 8) -> str:
+    """Annee scolaire en cours : 2026-2027 a partir du mois d'aout."""
+    today = date.today()
+    debut = today.year if today.month >= bascule_mois else today.year - 1
+    return f"{debut}-{debut + 1}"
+
+
+# Valeurs identiques pour tous les dossiers (remplacer par un texte fixe si besoin)
+CONSTANTES = {
+    "annee_scolaire": annee_scolaire_courante(),
+    "participant_niveau_cerp": "Niveau 5",
+}
+
 # Tuteurs légaux : une fiche par tuteur dont le nom est renseigné
 TUTEURS = [
     {
@@ -128,7 +143,6 @@ TUTEURS = [
 
 # Calculés dans apply_data_transformation : pays_ville, tuteurs_legaux
 # Pas encore dans Grist (-> « [donnée manquante] ») :
-#   annee_scolaire, participant_qualification, participant_niveau_cerp,
 #   personnel_qualification, personnel_niveau_cerp,
 #   responsables_envoi, responsables_accueil
 
@@ -207,6 +221,7 @@ def apply_data_transformation(data: dict) -> dict:
             set_list(transformed, param, [block.get(columns) for block in blocks])
         else:
             set_people(transformed, param, blocks, columns)
+    transformed.update(CONSTANTES)
     # colonne vide dans Grist : [donnee manquante] plutot qu'une case blanche
     for param in list(transformed):
         if param in STUDENT_DATA.__members__ and transformed[param] in ("", None):
