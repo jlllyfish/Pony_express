@@ -1,5 +1,8 @@
 #import "../erasmus_plus_utils/erasmus_plus_template_utils.typ" : * 
 
+// taille des paragraphes d'introduction (FR + traduction) sous les titres
+#let intro(body) = text(size: 8pt, body)
+
 #let contrat_pedagogique(
   code_projet: missing_data,
   type_activite: missing_data,
@@ -67,9 +70,11 @@
 
 #chap[
     
+    #intro[
     Ce contrat pédagogique définit les conditions et les acquis d’apprentissage attendus d’une mobilité à des fins d’apprentissage organisée dans le cadre du programme Erasmus+. Les parties prenantes à ce contrat doivent se conformer aux règles et aux standards de qualité du programme.
 
     _#englishStyling[This learning agreement defines the conditions and learning outcomes expected from a learning mobility organised as part of the Erasmus+ programme. The parties to this contract must comply with the programme’s rules and quality standards]_
+    ]
 
 ]
 
@@ -90,9 +95,11 @@
 = Parties prenantes au contrat pédagogique
 #chap[
     
+    #intro[
     Le contrat pédagogique est conclu entre le participant à la mobilité à des fins d’apprentissage, l’organisme d’envoi et l’organisme d’accueil. 
     
     _#englishStyling[The learning agreement is concluded between the participant in the learning mobility, the sending organisation and the hosting organisation.]_
+    ]
 
 ]
 
@@ -151,9 +158,11 @@
 = Contexte d’apprentissage
 #chap[
 
+  #intro[
   Au sein de l’organisme d’envoi, le participant est actuellement inscrit à :
   
   #englishStyling[At the sending organisation, the participant is currently enrolled in :]
+  ]
 
   === Apprenant
   #form((
@@ -162,9 +171,11 @@
     "Niveau dans le Cadre Européen des Certifications": participant_niveau_cerp
   ),wide_title: true)
 
+  #intro[
   Au sein de l’organisme d’envoi, le participant occupe actuellement la fonction de :
   
   #englishStyling[At the sending organisation, the participant is currently working in the following capacity :]
+  ]
 
   === Personnel
   #form((
@@ -177,9 +188,11 @@
 = Acquis d’apprentissage
 #chap[
 
+  #intro[
   Les parties ont convenu que les acquis d’apprentissage suivants devraient être atteints au cours de la mobilité à des fins d’apprentissage :
   
   _#englishStyling[The parties have agreed that the following learning outcomes should be achieved during the learning mobility :]_
+  ]
 
   #for acquis in acquis_list {
     [- #acquis]
@@ -190,9 +203,11 @@
 = Programme d’apprentissage et tâches
 
 #chap[
+  #intro[
   Pour atteindre les acquis d’apprentissage convenus, le participant réalisera les activités et tâches suivantes au cours de son activité de mobilité.
   
   _#englishStyling[To achieve the agreed learning outcomes, the participant will complete the following activities and tasks during their mobility activity.]_
+  ]
     
   #for activity in activites {
     [- #activity]
@@ -205,9 +220,11 @@
 
 #chap[
 
+  #intro[
   La (les) personne(s) suivante(s) de l’organisme d’accueil est (sont) chargée(s) de présenter au participant ses activités et ses tâches au sein de l’organisme d’accueil, de lui fournir un soutien pratique, de suivre ses progrès d’apprentissage, de l’aider à atteindre les acquis d’apprentissage attendus et de l’aider à s’intégrer dans lesroutines quotidiennes et le contexte social de l’organisme d’accueil. 
   
   _#englishStyling[The following person(s) at the hosting organisation are tasked with introducing the participant to their activities and tasks at the hosting organisation, providing practical support, monitoring their learning progress, supporting them to achieve the expected learning outcomes, and helping them to integrate into the daily routines and the social context at the hosting organisation.]_
+  ]
 
   #for personne in responsables_accueil {
     form((
@@ -225,9 +242,11 @@
 == Personnes responsables au sein de l’organisme d’envoi
 
 #chap[
+  #intro[
   La (les) personne(s) suivante(s) de l’organisme d’envoi est (sont) chargée(s) de suivre les progrès des participants et de fournir un contenu ou un soutien pratique de la part de l’organisme d’envoi.
   
   #englishStyling[The following person(s) at the sending organisation are tasked with following the participants' progress and providing content or practical support from the side of the sending organisation.]
+  ]
 
   #for personne in responsables_envoi {
     form((
@@ -245,9 +264,11 @@
 
 #chap[
 
+  #intro[
   La ou les personnes suivantes accompagneront le participant pendant sa période de mobilité.
   
   #englishStyling[The following person(s) will accompany the participant during their mobility period]
+  ]
 
   #for personne in accompagnants {
     form((
@@ -282,9 +303,11 @@
 = Signatures
 
 #chap[
+  #intro[
   Les signataires confirment qu’ils ont compris et approuvent le contenu de cet accord.
   
   #englishStyling[The signatories confirm that they understood and approve the content of this agreement.]
+  ]
 
   #let signatures_dict = (
     "Organisme d’envoi": organisation_envoi_nom,

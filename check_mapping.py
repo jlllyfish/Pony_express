@@ -103,14 +103,6 @@ def find_enum(mod) -> EnumType:
     return enums[0]
 
 
-def map_record(raw: dict, enum) -> dict:
-    """Réplique exacte de GristService.get_grist_data."""
-    data = {"id": raw["id"]}
-    for item in enum:
-        data[item.name] = raw[item.value] if item.value in raw else item.name + NOT_IN_GRIST
-    return data
-
-
 def walk(value, path=""):
     """Itère (chemin, valeur scalaire) dans une structure imbriquée."""
     if isinstance(value, dict):
@@ -173,74 +165,111 @@ def main():
         ok("Toutes les clés de l'Enum existent dans le template")
 
     # 3. Colonnes Grist -------------------------------------------------
-    title("3. Colonnes Grist")
-    if args.records:
-        raw_records = load_file(Path(args.records))
-        col_ids = set().union(*(r.keys() for r in raw_records)) - {"id"}
-        labels = {}
-        print(f"  (hors-ligne : colonnes déduites de {args.records})")
-    else:
+    from pony_express.service.grist import JOIN_KEY, make_lookup, map_record, normalize_key
+    offline_tables = {}
+    for spec in args.table:
+        name, _, path = spec.partition("=")
+        offline_tables[name] = load_file(Path(path))
+    svc = None
+    if not args.records:
         from pony_express.service.grist import GristService
         svc = GristService(mod.GRIST_DOC_ID, mod.GRIST_TEAM_SITE, mod.GRIST_SERVER)
-        st, cols = svc.grist.list_cols(mod.GRIST_TABLE, hidden=True)
-        if st != 200:
-            raise SystemExit(f"list_cols -> HTTP {st} : {cols}")
-        col_ids = {c["id"] for c in cols}
-        labels = {c["fields"].get("label", ""): c["id"] for c in cols}
-        st, raw_records = svc.grist.list_records(mod.GRIST_TABLE)
-        if st != 200:
-            raise SystemExit(f"list_records -> HTTP {st} : {raw_records}")
-    print(f"  {len(col_ids)} colonnes, {len(raw_records)} lignes")
-    bad = 0
-    for m in mapped:
-        if m.value in col_ids:
-            continue
-        bad += 1
+
+    cache = {}
+
+    def table_info(table):
+        """(IDs de colonnes, {libellé: ID}, lignes), ou None si la table est introuvable."""
+        if table not in cache:
+            if svc is None:
+                rows = offline_tables.get(table)
+                cache[table] = None if rows is None else (set().union(set(), *(r.keys() for r in rows)) - {"id"}, {}, rows)
+            else:
+                st, cols = svc.grist.list_cols(table, hidden=True)
+                if st != 200:
+                    cache[table] = None
+                else:
+                    st, rows = svc.grist.list_records(table)
+                    cache[table] = ({c["id"] for c in cols},
+                                    {c["fields"].get("label", ""): c["id"] for c in cols},
+                                    rows if st == 200 else [])
+        return cache[table]
+
+    def check_column(name, value, column, info):
+        cols, labels, _ = info
+        if column in cols:
+            return
         hint = ""
-        if m.value in labels:
-            hint = f" -> c'est un LIBELLÉ, l'ID est '{labels[m.value]}'"
+        if column in labels:
+            hint = f" -> c'est un LIBELLÉ, l'ID est '{labels[column]}'"
         else:
-            close = difflib.get_close_matches(m.value, list(col_ids), n=2, cutoff=0.6)
+            close = difflib.get_close_matches(column, list(cols), n=3, cutoff=0.5)
             if close:
                 hint = f" -> proche de : {close}"
-        fail(f"{m.name} = '{m.value}' : colonne introuvable{hint}")
-    if not bad:
+        fail(f"{name} = '{value}' : colonne introuvable{hint}")
+
+    title("3. Colonnes Grist")
+    if args.records:
+        offline_tables[mod.GRIST_TABLE] = load_file(Path(args.records))
+        print(f"  (hors-ligne : {args.records})")
+    main_info = table_info(mod.GRIST_TABLE)
+    if main_info is None:
+        raise SystemExit(f"Table principale '{mod.GRIST_TABLE}' introuvable (vérifier GRIST_TABLE / GRIST_DOC_ID)")
+    col_ids, _, raw_records = main_info
+    print(f"  {mod.GRIST_TABLE} (principale) : {len(col_ids)} colonnes, {len(raw_records)} lignes")
+    before = errors
+    joined = {}
+    for m in mapped:
+        if "." in m.value:
+            table, column = m.value.split(".", 1)
+            joined.setdefault(table, []).append((m, column))
+        else:
+            check_column(m.name, m.value, m.value, main_info)
+    if joined and JOIN_KEY not in col_ids:
+        fail(f"clé de jointure '{JOIN_KEY}' absente de la table principale")
+    main_keys = {normalize_key(r.get(JOIN_KEY)) for r in raw_records}
+    for table, items in joined.items():
+        info = table_info(table)
+        if info is None:
+            if svc is None:
+                warn(f"{table} : non vérifiée (hors-ligne, ajoutez --table {table}=fichier.csv)")
+            else:
+                fail(f"{table} : table introuvable -> champs concernés : {[m.name for m, _ in items]}")
+            continue
+        cols, _, rows = info
+        if JOIN_KEY not in cols:
+            fail(f"{table} : clé de jointure '{JOIN_KEY}' absente")
+        found = len(main_keys & {normalize_key(r.get(JOIN_KEY)) for r in rows})
+        print(f"  {table} (jointe) : {len(cols)} colonnes, {found}/{len(main_keys)} dossiers retrouvés")
+        if found < len(main_keys):
+            warn(f"{table} : {len(main_keys) - found} dossier(s) sans ligne correspondante")
+        for m, column in items:
+            check_column(m.name, m.value, column, info)
+    if errors == before:
         ok("Toutes les colonnes mappées existent")
+    lookup = make_lookup(lambda t: (table_info(t) or (None, None, []))[2])
 
     # 3b. Tables annexes (blocs répétables) ------------------------------
     extra_tables = getattr(mod, "EXTRA_TABLES", {})
     if extra_tables:
         title("3b. Tables annexes")
-        offline_tables = {}
-        for spec in args.table:
-            name, _, path = spec.partition("=")
-            offline_tables[name] = load_file(Path(path))
         for table, required in extra_tables.items():
-            if args.records:
-                rows = offline_tables.get(table)
-                if rows is None:
+            info = table_info(table)
+            if info is None:
+                if svc is None:
                     warn(f"{table} : pas de --table fourni -> considérée vide")
-                    rows = []
-                cols = set().union(*(r.keys() for r in rows)) if rows else set(required)
-            else:
-                st, info = svc.grist.list_cols(table, hidden=True)
-                if st != 200:
-                    fail(f"{table} : table introuvable (HTTP {st})")
-                    continue
-                cols = {c["id"] for c in info}
-                rows = svc.get_table_records(table)
+                else:
+                    fail(f"{table} : table introuvable")
+                continue
+            cols, _, rows = info
             absent = [c for c in required if c not in cols]
             if absent:
+                hints = {a: difflib.get_close_matches(a, list(cols), n=1) for a in absent}
                 fail(f"{table} : colonnes introuvables {absent}"
-                     + "".join(f" (proche de {difflib.get_close_matches(a, list(cols), n=1)})" for a in absent
-                               if difflib.get_close_matches(a, list(cols), n=1)))
+                     + "".join(f" ({a} proche de {h[0]})" for a, h in hints.items() if h))
             else:
-                key = getattr(mod, "BLOCK_KEY", None)
-                nb = len({r.get(key) for r in rows}) if key else "?"
-                ok(f"{table} : {len(rows)} lignes, {nb} dossiers")
-            if args.records and hasattr(mod, "fetch_table"):
-                offline_tables.setdefault(table, rows)
-        if args.records and hasattr(mod, "fetch_table"):
+                key = getattr(mod, "BLOCK_KEY", JOIN_KEY)
+                ok(f"{table} : {len(rows)} lignes, {len({r.get(key) for r in rows})} dossiers")
+        if svc is None and hasattr(mod, "fetch_table"):
             mod.fetch_table = lambda t: offline_tables.get(t, [])
 
     # 4. Données transformées -------------------------------------------
@@ -253,7 +282,7 @@ def main():
     names, results = {}, []
     for raw in sample:
         rid = raw["id"]
-        data = map_record(raw, enum)
+        data = map_record(raw, enum, lookup)
         try:
             t = mod.apply_data_transformation(data)
             pdf_name = mod.name_pdf(t)
@@ -288,12 +317,9 @@ def main():
             warn(f"« xxx is not in GRIST » imprimé pour : {', '.join(empty)}")
         if nones:
             warn(f"« None » imprimé pour : {', '.join(nones)}")
-        empty_lists = [k for k, d in params.items() if d.startswith("(") and not t.get(k)]
-        if empty_lists:
-            warn(f"« [donnée manquante] » imprimé pour les listes vides : {', '.join(empty_lists)}")
-        not_given = [p for p in params if p not in t and p not in empty_lists]
-        if not_given:
-            print(f"    défauts du template utilisés : {', '.join(not_given)}")
+        defaults = [k for k, d in params.items() if k not in t or (d.startswith("(") and not t[k])]
+        if defaults:
+            warn(f"« [donnée manquante] » imprimé pour : {', '.join(defaults)}")
         results.append((rid, pdf_name, t))
     for n, ids in names.items():
         if len(ids) > 1:
