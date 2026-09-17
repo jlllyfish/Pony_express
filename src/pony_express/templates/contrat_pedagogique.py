@@ -207,6 +207,10 @@ def apply_data_transformation(data: dict) -> dict:
             set_list(transformed, param, [block.get(columns) for block in blocks])
         else:
             set_people(transformed, param, blocks, columns)
+    # colonne vide dans Grist : [donnee manquante] plutot qu'une case blanche
+    for param in list(transformed):
+        if param in STUDENT_DATA.__members__ and transformed[param] in ("", None):
+            transformed.pop(param)
     return transformed
 
 
