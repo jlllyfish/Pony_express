@@ -317,9 +317,12 @@ def main():
             warn(f"« xxx is not in GRIST » imprimé pour : {', '.join(empty)}")
         if nones:
             warn(f"« None » imprimé pour : {', '.join(nones)}")
-        defaults = [k for k, d in params.items() if k not in t or (d.startswith("(") and not t[k])]
+        defaults = [k for k in params if k not in t]
         if defaults:
             warn(f"« [donnée manquante] » imprimé pour : {', '.join(defaults)}")
+        empties = [k for k, d in params.items() if k in t and d.startswith("(") and not t[k]]
+        if empties:
+            print(f"    listes vides (rien d'affiché) : {', '.join(empties)}")
         results.append((rid, pdf_name, t))
     for n, ids in names.items():
         if len(ids) > 1:
