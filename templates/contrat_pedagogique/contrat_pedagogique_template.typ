@@ -120,7 +120,7 @@
 #for guardian in tuteurs_legaux {
   
   let displayed_index = if tuteurs_legaux.len() == 1 {""} else {index} 
-  [=== Tuteur légal #displayed_index]
+  if tuteurs_legaux.len() == 1 [=== Tuteur légal] else [=== Tuteur légal #index]
   form((
       "Nom":guardian.nom,
       "Prénom" :guardian.prenom,

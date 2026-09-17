@@ -85,6 +85,17 @@ def typst_params(typ_file: Path, func: str) -> tuple[dict[str, str], bool]:
 
 
 # ---------------------------------------------------------------- Helpers
+def missing_translations(typ: Path) -> list[str]:
+    """Clés absentes du dictionnaire de traductions (si le template les marque <missing-translation>)."""
+    cmd = ["typst", "query", "--root", str(ROOT), "--font-path", str(TEMPLATES),
+           str(typ), "<missing-translation>", "--field", "value"]
+    p = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8")
+    try:
+        return list(dict.fromkeys(json.loads(p.stdout))) if p.returncode == 0 else []
+    except json.JSONDecodeError:
+        return []
+
+
 def load_file(path: Path) -> list[dict]:
     """Lignes d'un export CSV (Grist / tableur) ou d'un JSON."""
     if path.suffix.lower() == ".json":
@@ -334,6 +345,7 @@ def main():
         from pony_express.service.pdf import create_call_to_template_string
         OUT_DIR.mkdir(parents=True, exist_ok=True)
         import_path = os.path.relpath(typ_file, OUT_DIR).replace(os.sep, "/")
+        untranslated = {}
         for rid, pdf_name, t in results:
             typ = OUT_DIR / f"{pdf_name}.typ"
             typ.write_text(f'#import "{import_path}": *\n'
@@ -342,9 +354,18 @@ def main():
                                capture_output=True, text=True, encoding="utf-8")
             if p.returncode == 0:
                 ok(f"ligne {rid} -> {typ.with_suffix('.pdf').relative_to(ROOT)}")
+                for key in missing_translations(typ):
+                    untranslated.setdefault(key, []).append(rid)
             else:
                 fail(f"ligne {rid} : typst en échec (.typ conservé : {typ.relative_to(ROOT)})")
                 print("    " + "\n    ".join(l[:160] for l in p.stderr.strip().splitlines()[:6]))
+
+        if untranslated:
+            warn(f"Traductions manquantes (« missing translation » en rouge) : {len(untranslated)}")
+            print("    à ajouter dans templates/erasmus_plus_utils/erasmus_translation.typ :")
+            for key, rids in untranslated.items():
+                note = "   // espace en trop : corriger plutôt le template" if key != key.strip() else ""
+                print(f'      "{key}": "",{note}')
 
     title("Résultat : " + ("OK" if not errors else f"{errors} erreur(s)"))
     sys.exit(1 if errors else 0)

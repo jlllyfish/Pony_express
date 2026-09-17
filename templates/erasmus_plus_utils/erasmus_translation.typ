@@ -100,7 +100,7 @@
   if translations.keys().contains(string) {
     return translations.at(string)
   } else {
-    return text(red,"missing translation")
+    return [#metadata(string)<missing-translation>#text(red, "missing translation : " + string)]
   }
 }
 
