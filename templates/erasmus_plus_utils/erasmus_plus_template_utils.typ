@@ -81,6 +81,17 @@
   
 }
 
+// plusieurs fiches a la suite (personnes) : meme espacement qu'entre les lignes d'une fiche
+#let forms(items, activate_translation: true, wide_title: false) = block(
+  inset: 5pt,
+  for fields in items {
+    block(breakable: false, spacing: 0.65em,
+      for key in fields.keys() {
+        form_item(key, fields.at(key),
+          activate_translation: activate_translation, wide_title: wide_title)
+      })
+  })
+
 ////////////////
 // Signatures //
 ////////////////
@@ -194,7 +205,7 @@
 
     let heading_counter = counter(heading).get()
     let level1 = [#text(30pt, weight: "bold", [#heading_counter.at(0)])]
-    let level2 = [#text(25pt, weight: "bold", [#heading_counter.at(0)])]
+    let level2 = [#text(25pt, weight: "bold", [#heading_counter.at(1)])]
 
     pad(y: 10pt,
       grid(
@@ -218,6 +229,9 @@
     }    
     }
   }
+
+  // un titre ne reste jamais seul en bas de page (regle placee apres les autres : appliquee en premier)
+  show heading: it => block(sticky: true, it)
 
   set par(
     justify: true,
