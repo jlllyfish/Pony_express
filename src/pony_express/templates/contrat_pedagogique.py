@@ -12,7 +12,9 @@ from pony_express.service.utils import clean_text, get_date_from_timestamp, grou
 GRIST_SERVER = os.environ["GRIST_SERVER"]
 GRIST_TEAM_SITE = os.environ["GRIST_TEAM_SITE"]
 GRIST_DOC_ID = os.environ["GRIST_DOC_ID"]
-GRIST_TABLE = os.environ["GRIST_TABLE"]  # table principale (ex : Demarche_128447_annotations)
+GRIST_TABLE = os.environ[
+    "GRIST_TABLE"
+]  # table principale (ex : Demarche_128447_annotations)
 GRIST_PDF_COLUMN = None
 
 # Template Typst
@@ -25,7 +27,9 @@ DEMARCHE = "128447"
 TABLE_CHAMPS = f"Demarche_{DEMARCHE}_champs"
 TABLE_ACQUIS = f"Demarche_{DEMARCHE}_repetable_acquis_d_apprentissage"
 TABLE_ACTIVITES = f"Demarche_{DEMARCHE}_repetable_activites_et_taches"
-TABLE_ACCOMPAGNATEURS = f"Demarche_{DEMARCHE}_repetable_information_personnelle_accompagnateur"
+TABLE_ACCOMPAGNATEURS = (
+    f"Demarche_{DEMARCHE}_repetable_information_personnelle_accompagnateur"
+)
 BLOCK_KEY = "dossier_number"  # numéro de dossier dans les tables de blocs
 BLOCK_ORDER = "block_row_index"  # ordre des blocs
 
@@ -62,6 +66,10 @@ JOINTES = {
         "date_fin": "date_fin_activite_hors_jours_de_voyage",
         "pays": "pays_d_accueil",
         "ville": "ville_pays_d_accueil",
+        "organisation_accueil_nom": "nom_de_l_organisme_d_accueil",
+        "organisation_accueil_adresse": "adresse_organisme_d_accueil",
+        "organisation_accueil_email": "mail_organisme_d_accueil",
+        "organisation_accueil_telephone": "telephone_organisme_d_accueil",
     },
 }
 
@@ -72,28 +80,38 @@ BLOCS = {
     "acquis_list": (TABLE_ACQUIS, "acquis"),
     "activites": (TABLE_ACTIVITES, "activite"),
     "tutorings": (TABLE_ACTIVITES, "tutorat_et_suivi_de_cette_activite"),
-    "accompagnants": (TABLE_ACCOMPAGNATEURS, {
-        "nom": "nom",
-        "prenom": "prenom",
-        "email": "adresse_electronique",
-        "telephone": "numero_de_telephone",
-        "responsabilites": "fonction",
-    }),
+    "accompagnants": (
+        TABLE_ACCOMPAGNATEURS,
+        {
+            "nom": "nom",
+            "prenom": "prenom",
+            "email": "adresse_electronique",
+            "telephone": "numero_de_telephone",
+            "responsabilites": "fonction",
+        },
+    ),
 }
 
 # Tuteurs légaux : une fiche par tuteur dont le nom est renseigné
 TUTEURS = [
-    {"nom": "tuteur_1_nom", "prenom": "tuteur_1_prenom",
-     "email": "tuteur_1_email", "telephone": "tuteur_1_telephone"},
-    {"nom": "tuteur_2_nom", "prenom": "tuteur_2_prenom",
-     "email": "tuteur_2_email", "telephone": "tuteur_2_telephone"},
+    {
+        "nom": "tuteur_1_nom",
+        "prenom": "tuteur_1_prenom",
+        "email": "tuteur_1_email",
+        "telephone": "tuteur_1_telephone",
+    },
+    {
+        "nom": "tuteur_2_nom",
+        "prenom": "tuteur_2_prenom",
+        "email": "tuteur_2_email",
+        "telephone": "tuteur_2_telephone",
+    },
 ]
 
 # Calculés dans apply_data_transformation : pays_ville, tuteurs_legaux
 # Pas encore dans Grist (-> « [donnée manquante] ») :
 #   annee_scolaire, participant_qualification, participant_niveau_cerp,
 #   organisation_envoi_nom / _adresse / _email / _telephone,
-#   organisation_accueil_nom / _adresse / _email / _telephone,
 #   personnel_qualification, personnel_niveau_cerp,
 #   responsables_envoi, responsables_accueil
 
@@ -101,6 +119,7 @@ TUTEURS = [
 # =====================================================================
 # Construction automatique (rien à modifier ici pour le mapping)
 # =====================================================================
+
 
 def build_enum(name: str, principale: dict, jointes: dict) -> Enum:
     """Enum attendue par PonyExpress : nom = paramètre Typst, valeur = colonne ou "Table.colonne"."""
@@ -134,7 +153,9 @@ def should_be_exported(record: dict) -> bool:
 
 
 def name_pdf(record) -> str:
-    return slugify(f"{record['participant_nom']}_{record['participant_prenom']}_{record['id']}_pedagogique")
+    return slugify(
+        f"{record['participant_nom']}_{record['participant_prenom']}_{record['id']}_pedagogique"
+    )
 
 
 def apply_data_transformation(data: dict) -> dict:
@@ -142,8 +163,12 @@ def apply_data_transformation(data: dict) -> dict:
     set_date(transformed, "date_debut")
     set_date(transformed, "date_fin")
     set_joined(transformed, "pays_ville", [value(data, "pays"), value(data, "ville")])
-    set_people(transformed, "tuteurs_legaux", [data] * len(TUTEURS), TUTEURS, required="nom")
-    transformed.setdefault("tuteurs_legaux", [])  # aucun tuteur (majeur) : pas de rubrique
+    set_people(
+        transformed, "tuteurs_legaux", [data] * len(TUTEURS), TUTEURS, required="nom"
+    )
+    transformed.setdefault(
+        "tuteurs_legaux", []
+    )  # aucun tuteur (majeur) : pas de rubrique
 
     dossier = data.get("numero_dossier")
     for param, (table, columns) in BLOCS.items():
@@ -164,7 +189,9 @@ _blocks_cache: dict[str, dict] = {}
 
 def fetch_table(table: str) -> list[dict]:
     """Lit une table Grist entière (remplacée par check_mapping.py en mode hors-ligne)."""
-    return GristService(GRIST_DOC_ID, GRIST_TEAM_SITE, GRIST_SERVER).get_table_records(table)
+    return GristService(GRIST_DOC_ID, GRIST_TEAM_SITE, GRIST_SERVER).get_table_records(
+        table
+    )
 
 
 def get_blocks(table: str, dossier_number) -> list[dict]:
@@ -209,15 +236,19 @@ def set_list(data: dict, key: str, values: list) -> None:
         data.pop(key, None)
 
 
-def set_people(data: dict, key: str, rows: list[dict], columns, required: str | None = None) -> None:
+def set_people(
+    data: dict, key: str, rows: list[dict], columns, required: str | None = None
+) -> None:
     """
     Une fiche par ligne : {champ du template : colonne}.
     `columns` : un dictionnaire commun à toutes les lignes, ou une liste (un par ligne).
     Fiche ignorée si elle est vide (ou si le champ `required` est vide). Aucune fiche : [donnée manquante].
     """
     mappings = columns if isinstance(columns, list) else [columns] * len(rows)
-    people = [{field: value(row, column) for field, column in mapping.items()}
-              for row, mapping in zip(rows, mappings)]
+    people = [
+        {field: value(row, column) for field, column in mapping.items()}
+        for row, mapping in zip(rows, mappings)
+    ]
     people = [p for p in people if (p[required] if required else any(p.values()))]
     if people:
         data[key] = people
