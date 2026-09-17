@@ -8,6 +8,9 @@
 #let heading_number_size = 20pt
 #let subheading_number_size = 17pt
 
+// espace entre deux fiches de personnes (0.65em = colle aux autres lignes)
+#let people_spacing = 1.2em
+
 #let missing_data = "[donnée manquante]"
 
 #let custom_data(it) = if (it == missing_data) {
@@ -86,14 +89,22 @@
 }
 
 // plusieurs fiches a la suite (personnes) : meme espacement qu'entre les lignes d'une fiche
-#let forms(items, activate_translation: true, wide_title: false) = block(
+// title_key : cle affichee en intertitre au-dessus de la fiche (et retiree du tableau)
+#let forms(items, activate_translation: true, wide_title: false, title_key: none) = block(
   inset: 5pt,
   for fields in items {
-    block(breakable: false, spacing: 0.65em,
+    block(breakable: false, spacing: people_spacing, {
+      if title_key != none and title_key in fields and fields.at(title_key) != "" {
+        text(weight: "bold", fields.at(title_key))
+        v(-0.45em)
+      }
       for key in fields.keys() {
-        form_item(key, fields.at(key),
-          activate_translation: activate_translation, wide_title: wide_title)
-      })
+        if title_key == none or key != title_key {
+          form_item(key, fields.at(key),
+            activate_translation: activate_translation, wide_title: wide_title)
+        }
+      }
+    })
   })
 
 ////////////////

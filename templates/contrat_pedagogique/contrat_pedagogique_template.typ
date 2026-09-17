@@ -227,7 +227,7 @@
   _#englishStyling[The following person(s) at the hosting organisation are tasked with introducing the participant to their activities and tasks at the hosting organisation, providing practical support, monitoring their learning progress, supporting them to achieve the expected learning outcomes, and helping them to integrate into the daily routines and the social context at the hosting organisation.]_
   ]
 
-  #forms(responsables_accueil.map(personne => (
+  #forms(title_key: "Responsabilités", responsables_accueil.map(personne => (
     "Nom": personne.nom,
     "Prénom":personne.prenom,
     "Adresse mail":personne.email,
@@ -247,7 +247,7 @@
   #englishStyling[The following person(s) at the sending organisation are tasked with following the participants' progress and providing content or practical support from the side of the sending organisation.]
   ]
 
-  #forms(responsables_envoi.map(personne => (
+  #forms(title_key: "Responsabilités", responsables_envoi.map(personne => (
     "Nom": personne.nom,
     "Prénom":personne.prenom,
     "Adresse mail":personne.email,
@@ -266,7 +266,7 @@
   #englishStyling[The following person(s) will accompany the participant during their mobility period]
   ]
 
-  #forms(accompagnants.map(personne => (
+  #forms(title_key: "Responsabilités", accompagnants.map(personne => (
     "Nom": personne.nom,
     "Prénom":personne.prenom,
     "Adresse mail":personne.email,

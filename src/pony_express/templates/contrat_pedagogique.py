@@ -74,6 +74,39 @@ JOINTES = {
         "organisation_accueil_adresse": "adresse_organisme_d_accueil",
         "organisation_accueil_email": "mail_organisme_d_accueil",
         "organisation_accueil_telephone": "telephone_organisme_d_accueil",
+        "tuteur_nom": "nom_tuteur",
+        "tuteur_prenom": "prenom_tuteur",
+        "tuteur_email": "mail_tuteur",
+        "tuteur_telephone": "numero_de_telephone_tuteur",
+        "contact_admin_identique": "le_contact_administratif_est_le_meme_que_tuteur",
+        "contact_admin_nom": "nom_contact_administratif",
+        "contact_admin_prenom": "prenom_contact_administratif",
+        "contact_admin_fonction": "fonction_contact_administratif",
+        "contact_admin_email": "mail_contact_administratif",
+        "contact_admin_telephone": "telephone_contact_administratif",
+        # organisme d'accueil : responsable, puis contact / tuteur / contact d'urgence
+        "accueil_resp_nom": "nom_responsable_organisme_d_accueil",
+        "accueil_resp_prenom": "prenom_responsable_organisme_d_accueil",
+        "accueil_resp_email": "mail_responsable_organisme_d_accueil",
+        "accueil_resp_telephone": "telephone_responsable_organisme_d_accueil",
+        "accueil_resp_est_contact": "la_personne_responsable_de_l_organisme_d_accueil_est_egalement_la_personne_de_contact",
+        "accueil_resp_est_tuteur": "la_personne_responsable_de_l_organisme_d_accueil_est_egalement_le_tuteur",
+        "accueil_resp_est_urgence": "la_personne_responsable_de_l_organisme_d_accueil_est_egalement_le_contact_d_urgence",
+        "accueil_contact_est_tuteur": "la_personne_de_contact_de_l_organisme_d_accueil_est_egalement_le_tuteur",
+        "accueil_contact_est_urgence": "la_personne_de_contact_de_l_organisme_d_accueil_est_egalement_le_contact_d_urgence",
+        "accueil_tuteur_est_urgence": "le_tuteur_de_l_organisme_d_accueil_est_egalement_le_contact_d_urgence",
+        "accueil_contact_nom": "nom",
+        "accueil_contact_prenom": "prenom",
+        "accueil_contact_email": "mail",
+        "accueil_contact_telephone": "telephone",
+        "accueil_tuteur_nom": "nom_1",
+        "accueil_tuteur_prenom": "prenom_1",
+        "accueil_tuteur_email": "mail_1",
+        "accueil_tuteur_telephone": "numero_de_telephone",
+        "accueil_urgence_nom": "nom_2",
+        "accueil_urgence_prenom": "prenom_2",
+        "accueil_urgence_email": "mail_2",
+        "accueil_urgence_telephone": "numero_de_telephone_1",
     },
 }
 
@@ -124,6 +157,16 @@ CONSTANTES = {
     "annee_scolaire": annee_scolaire_courante(),
     "participant_niveau_cerp": "Niveau 5",
 }
+
+# Section 8.1 : une fiche par personne distincte de l'organisme d'accueil
+#   (titre affiche, case "c'est la meme personne", prefixe des parametres)
+RESPONSABLES_ACCUEIL = [
+    ("Responsable", (), "accueil_resp"),
+    ("Contact", ("accueil_resp_est_contact",), "accueil_contact"),
+    ("Tuteur", ("accueil_resp_est_tuteur", "accueil_contact_est_tuteur"), "accueil_tuteur"),
+    ("Contact d'urgence", ("accueil_resp_est_urgence", "accueil_contact_est_urgence",
+                           "accueil_tuteur_est_urgence"), "accueil_urgence"),
+]
 
 # Tuteurs légaux : une fiche par tuteur dont le nom est renseigné
 TUTEURS = [
@@ -222,6 +265,16 @@ def apply_data_transformation(data: dict) -> dict:
         else:
             set_people(transformed, param, blocks, columns)
     transformed.update(CONSTANTES)
+    responsables = get_responsables_envoi(data)
+    if responsables:
+        transformed["responsables_envoi"] = responsables
+    else:
+        transformed.pop("responsables_envoi", None)
+    accueil = get_responsables_accueil(data)
+    if accueil:
+        transformed["responsables_accueil"] = accueil
+    else:
+        transformed.pop("responsables_accueil", None)
     # colonne vide dans Grist : [donnee manquante] plutot qu'une case blanche
     for param in list(transformed):
         if param in STUDENT_DATA.__members__ and transformed[param] in ("", None):
@@ -333,6 +386,52 @@ def apply_references(transformed: dict, data: dict) -> None:
                 transformed[param] = text
             else:
                 transformed.pop(param, None)
+
+
+def is_true(row: dict, key: str) -> bool:
+    """Case a cocher Grist : True, "true", "oui", 1..."""
+    raw = row.get(key)
+    if isinstance(raw, bool):
+        return raw
+    return value(row, key).lower() in ("true", "vrai", "oui", "yes", "1")
+
+
+def get_responsables_envoi(data: dict) -> list[dict]:
+    """Tuteur, plus le contact administratif quand ce n'est pas la meme personne."""
+    people = [{
+        "nom": value(data, "tuteur_nom"),
+        "prenom": value(data, "tuteur_prenom"),
+        "email": value(data, "tuteur_email"),
+        "telephone": value(data, "tuteur_telephone"),
+        "responsabilites": "Tuteur",
+    }]
+    if not is_true(data, "contact_admin_identique"):
+        people.append({
+            "nom": value(data, "contact_admin_nom"),
+            "prenom": value(data, "contact_admin_prenom"),
+            "email": value(data, "contact_admin_email"),
+            "telephone": value(data, "contact_admin_telephone"),
+            "responsabilites": "Contact administratif",
+        })
+    return [person for person in people if person["nom"]]
+
+
+def get_responsables_accueil(data: dict) -> list[dict]:
+    """Une fiche par personne : le responsable, puis celles qui sont d'autres personnes."""
+    people = []
+    for role, memes, prefixe in RESPONSABLES_ACCUEIL:
+        if any(is_true(data, drapeau) for drapeau in memes):
+            continue
+        person = {
+            "nom": value(data, prefixe + "_nom"),
+            "prenom": value(data, prefixe + "_prenom"),
+            "email": value(data, prefixe + "_email"),
+            "telephone": value(data, prefixe + "_telephone"),
+            "responsabilites": role,
+        }
+        if person["nom"]:
+            people.append(person)
+    return people
 
 
 if __name__ == "__main__":
