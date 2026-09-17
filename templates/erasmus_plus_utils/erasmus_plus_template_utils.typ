@@ -4,6 +4,10 @@
 #let blue_line =  line(length: 100%, stroke: (paint: rgb("#333399")))
 #let black_line =  line(length: 85%, stroke: (paint: black))
 
+// taille des numeros de titres (1, 2...) et de sous-titres (le 2 de 4.2)
+#let heading_number_size = 20pt
+#let subheading_number_size = 17pt
+
 #let missing_data = "[donnée manquante]"
 
 #let custom_data(it) = if (it == missing_data) {
@@ -141,7 +145,7 @@
 // Layout //
 ////////////
 
-#let erasmus_plus_layout(title: "", translation: "", activate_translation: true, doc) = {
+#let erasmus_plus_layout(title: "", translation: "", activate_translation: true, header_note: none, doc) = {
   set text(font: "Marianne")
   
   let moow_logo = image("assets/header_logo.png",
@@ -158,6 +162,10 @@
       erasmus_logo
     )
     black_line
+    if header_note != none {
+      v(-0.4em)
+      align(right, text(9pt, header_note))
+    }
     erasmus_title(title, translation: translation)
   }
 
@@ -189,7 +197,7 @@
       grid(
         columns: (1fr, 9fr),
         column-gutter: 10pt,
-        align(right, text(30pt, counter(heading).display())),
+        align(right, text(heading_number_size, counter(heading).display())),
         align(horizon, titleBlock), 
     ))
   }
@@ -204,14 +212,14 @@
     }
 
     let heading_counter = counter(heading).get()
-    let level1 = [#text(30pt, weight: "bold", [#heading_counter.at(0)])]
-    let level2 = [#text(25pt, weight: "bold", [#heading_counter.at(1)])]
+    let level1 = [#text(heading_number_size, weight: "bold", [#heading_counter.at(0)])]
+    let level2 = [#text(subheading_number_size, weight: "bold", [#heading_counter.at(1)])]
 
     pad(y: 10pt,
       grid(
         columns: (1fr, 9fr),
         column-gutter: 10pt,
-        align(right, text(30pt, [#level1.#level2])),
+        align(right, text(heading_number_size, [#level1.#level2])),
         align(horizon, titleBlock), 
       )  
     )

@@ -30,6 +30,7 @@ TABLE_ACTIVITES = f"Demarche_{DEMARCHE}_repetable_activites_et_taches"
 TABLE_ACCOMPAGNATEURS = (
     f"Demarche_{DEMARCHE}_repetable_information_personnelle_accompagnateur"
 )
+TABLE_ETABLISSEMENTS = "Etablissements"
 BLOCK_KEY = "dossier_number"  # numéro de dossier dans les tables de blocs
 BLOCK_ORDER = "block_row_index"  # ordre des blocs
 
@@ -66,6 +67,7 @@ JOINTES = {
         "date_fin": "date_fin_activite_hors_jours_de_voyage",
         "pays": "pays_d_accueil",
         "ville": "ville_pays_d_accueil",
+        "etablissement": "votre_etablissement",  # valeur = ref_etab_DN
         "organisation_accueil_nom": "nom_de_l_organisme_d_accueil",
         "organisation_accueil_adresse": "adresse_organisme_d_accueil",
         "organisation_accueil_email": "mail_organisme_d_accueil",
@@ -92,6 +94,22 @@ BLOCS = {
     ),
 }
 
+# Tables de reference : UNE ligne choisie pour le dossier
+#   "lien": None                      -> la table ne doit contenir qu'une seule ligne
+#   "lien": (parametre, "colonne")    -> ligne dont la colonne = valeur du parametre du dossier
+#                                       (parametre declare dans PRINCIPALE ou JOINTES ; "id" pour une colonne Reference)
+REFERENCES = {
+    TABLE_ETABLISSEMENTS: {
+        "lien": ("etablissement", "ref_etab_DN"),
+        "champs": {
+            "organisation_envoi_nom": "Nom_etablissement",
+            "organisation_envoi_adresse": "Adresse",
+            "organisation_envoi_email": "Mail",
+            "organisation_envoi_telephone": "Telephone",
+        },
+    },
+}
+
 # Tuteurs légaux : une fiche par tuteur dont le nom est renseigné
 TUTEURS = [
     {
@@ -111,7 +129,6 @@ TUTEURS = [
 # Calculés dans apply_data_transformation : pays_ville, tuteurs_legaux
 # Pas encore dans Grist (-> « [donnée manquante] ») :
 #   annee_scolaire, participant_qualification, participant_niveau_cerp,
-#   organisation_envoi_nom / _adresse / _email / _telephone,
 #   personnel_qualification, personnel_niveau_cerp,
 #   responsables_envoi, responsables_accueil
 
@@ -143,8 +160,20 @@ def build_extra_tables(blocs: dict) -> dict:
     return tables
 
 
+def build_reference_tables(references: dict) -> dict:
+    """Colonnes attendues dans chaque table de reference (controlees par check_mapping.py)."""
+    tables = {}
+    for table, ref in references.items():
+        expected = list(dict.fromkeys(ref["champs"].values()))
+        if ref["lien"] and ref["lien"][1] != "id" and ref["lien"][1] not in expected:
+            expected.append(ref["lien"][1])
+        tables[table] = expected
+    return tables
+
+
 STUDENT_DATA = build_enum("STUDENT_DATA", PRINCIPALE, JOINTES)
 EXTRA_TABLES = build_extra_tables(BLOCS)
+EXTRA_TABLES.update(build_reference_tables(REFERENCES))
 
 
 def should_be_exported(record: dict) -> bool:
@@ -170,6 +199,7 @@ def apply_data_transformation(data: dict) -> dict:
         "tuteurs_legaux", []
     )  # aucun tuteur (majeur) : pas de rubrique
 
+    apply_references(transformed, data)
     dossier = data.get("numero_dossier")
     for param, (table, columns) in BLOCS.items():
         blocks = get_blocks(table, dossier)
@@ -254,6 +284,36 @@ def set_people(
         data[key] = people
     else:
         data.pop(key, None)
+
+
+_reference_cache: dict[str, list[dict]] = {}
+
+
+def get_reference(table: str, lien, data: dict) -> dict | None:
+    """Ligne de la table de reference correspondant au dossier (None si aucune ou ambigue)."""
+    if table not in _reference_cache:
+        _reference_cache[table] = fetch_table(table)
+    rows = _reference_cache[table]
+    if lien is None:
+        return rows[0] if len(rows) == 1 else None
+    param, column = lien
+    wanted = value(data, param).casefold()
+    if not wanted:
+        return None
+    matches = [r for r in rows if clean_text(r.get(column)).casefold() == wanted]
+    return matches[0] if len(matches) == 1 else None
+
+
+def apply_references(transformed: dict, data: dict) -> None:
+    """Remplit les champs des tables de reference ; sans correspondance : [donnee manquante]."""
+    for table, ref in REFERENCES.items():
+        row = get_reference(table, ref["lien"], data) or {}
+        for param, column in ref["champs"].items():
+            text = value(row, column)
+            if text:
+                transformed[param] = text
+            else:
+                transformed.pop(param, None)
 
 
 if __name__ == "__main__":

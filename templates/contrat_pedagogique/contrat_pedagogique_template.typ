@@ -61,6 +61,7 @@
  ) = [
 
 #show: doc => erasmus_plus_layout(
+  header_note: [Code projet : #code_projet],
   title:[CONTRAT PÉDAGOGIQUE ERASMUS+], 
   translation: "ERASMUS+ learning agreement",
   doc
