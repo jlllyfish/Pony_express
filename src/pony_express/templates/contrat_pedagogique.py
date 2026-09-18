@@ -69,6 +69,11 @@ JOINTES = {
         "date_fin": "date_fin_activite_hors_jours_de_voyage",
         "pays": "pays_d_accueil",
         "ville": "ville_pays_d_accueil",
+        "evaluation_format": "format_et_procedures_d_evaluation",
+        "evaluation_criteres": "criteres_d_evaluation",
+        "reconnaissance": "reconnaisance_des_acquis_d_apprentissage",
+        "retour_lieu": "lieu_du_retour",
+        "retour_conditions": "condition_du_retour",
         "etablissement": "votre_etablissement",  # valeur = ref_etab_DN
         "organisation_accueil_nom": "nom_de_l_organisme_d_accueil",
         "organisation_accueil_adresse": "adresse_organisme_d_accueil",

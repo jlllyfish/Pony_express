@@ -19,7 +19,15 @@
   text(blue, it)
 }
 
-#let chap(it) = block(inset: (left: 12%), it) 
+#let chap_indent = 12%       // retrait du corps de texte
+#let subheading_indent = 16pt  // retrait supplementaire des sous-titres
+#let heading_size = 13pt      // titres (avant : 15pt)
+#let subheading_size = 11pt    // taille des sous-titres (titres : 15pt)
+
+#let chap(it, level: 1) = block(
+  width: 100%,
+  inset: (left: chap_indent + if level >= 2 { subheading_indent } else { 0pt }),
+  it) 
 
 #let englishStyling(english) = {
   text(gray, [#english])
@@ -197,10 +205,11 @@
   show heading.where(level: 1): it => {
 
     let titleBlock = {
-      text(15pt, it.body) 
+      text(heading_size, it.body) 
       if (activate_translation) {
         linebreak()
-        englishStyling(text(13pt, translate(it.body)))
+        v(-0.9em)
+        englishStyling(text(heading_size - 2pt, translate(it.body)))
       }
     }
 
@@ -215,24 +224,21 @@
 
   show heading.where(level: 2): it => {
     let titleBlock = {
-      text(15pt, it.body) 
+      text(subheading_size, it.body)
       if (activate_translation) {
         linebreak()
-        englishStyling(text(13pt, translate(it.body)))
+        v(-0.9em)
+        englishStyling(text(subheading_size - 2pt, translate(it.body)))
       }
     }
 
-    let heading_counter = counter(heading).get()
-    let level1 = [#text(heading_number_size, weight: "bold", [#heading_counter.at(0)])]
-    let level2 = [#text(subheading_number_size, weight: "bold", [#heading_counter.at(1)])]
-
-    pad(y: 10pt,
+    pad(y: 10pt, left: subheading_indent,
       grid(
         columns: (1fr, 9fr),
         column-gutter: 10pt,
-        align(right, text(heading_number_size, [#level1.#level2])),
-        align(horizon, titleBlock), 
-      )  
+        align(right, text(subheading_number_size, counter(heading).display())),
+        align(horizon, titleBlock),
+      )
     )
   }
 

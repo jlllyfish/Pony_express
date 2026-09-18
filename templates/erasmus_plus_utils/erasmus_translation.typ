@@ -56,6 +56,10 @@
   "rapport final": "final report",
 
   // R S T
+  "Format et procédures d’évaluation": "Assessment format and procedures",
+  "Critères d’évaluation": "Assessment criteria",
+  "Lieu du retour": "Place of return",
+  "Conditions du retour": "Conditions of return",
   "Reconnaissance des acquis d’apprentissage": "Recognition of learning outcomes",
   "Réintégration dans l’organisme d’envoi": "Reintégration at the sending organisation",
   "Responsabilités": "Responsabilities",

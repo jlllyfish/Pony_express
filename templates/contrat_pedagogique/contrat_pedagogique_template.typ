@@ -57,6 +57,11 @@
     telephone: missing_data,
     responsabilites: missing_data),
   ),
+  evaluation_format: missing_data,
+  evaluation_criteres: missing_data,
+  reconnaissance: missing_data,
+  retour_lieu: missing_data,
+  retour_conditions: missing_data,
   ..superfluous_arguments
  ) = [
 
@@ -134,7 +139,7 @@
 ]
 
 == Organisme d’envoi
-#chap[
+#chap(level: 2)[
 
   #form((
         "Nom de l'organisme":organisation_envoi_nom,
@@ -145,7 +150,7 @@
 ]
 
 == Organisme d’accueil
-#chap[
+#chap(level: 2)[
   
   #form((
         "Nom de l'organisme":organisation_accueil_nom,
@@ -219,7 +224,7 @@
 
 == Personnes responsables au sein de l’organisme d’accueil
 
-#chap[
+#chap(level: 2)[
 
   #intro[
   La (les) personne(s) suivante(s) de l’organisme d’accueil est (sont) chargée(s) de présenter au participant ses activités et ses tâches au sein de l’organisme d’accueil, de lui fournir un soutien pratique, de suivre ses progrès d’apprentissage, de l’aider à atteindre les acquis d’apprentissage attendus et de l’aider à s’intégrer dans lesroutines quotidiennes et le contexte social de l’organisme d’accueil. 
@@ -240,7 +245,7 @@
 
 == Personnes responsables au sein de l’organisme d’envoi
 
-#chap[
+#chap(level: 2)[
   #intro[
   La (les) personne(s) suivante(s) de l’organisme d’envoi est (sont) chargée(s) de suivre les progrès des participants et de fournir un contenu ou un soutien pratique de la part de l’organisme d’envoi.
   
@@ -277,7 +282,7 @@
 
 == Modalités de suivi et de tutorat
 
-#chap[
+#chap(level: 2)[
 
     #for tutoring in tutorings {
       [- #tutoring]
@@ -286,12 +291,28 @@
 ]
 
 = Évaluation des acquis d’apprentissage
+#chap[
+  === Format et procédures d’évaluation
+  #evaluation_format
+
+  === Critères d’évaluation
+  #evaluation_criteres
+]
 
 = Reconnaissance des acquis d’apprentissage
+#chap[#reconnaissance]
 
 = Réintégration dans l’organisme d’envoi
+#chap[
+  === Lieu du retour
+  #retour_lieu
+
+  === Conditions du retour
+  #retour_conditions
+]
 
 = Disposition supplémentaires
+#chap[Sans objet]
 
 = Signatures
 
