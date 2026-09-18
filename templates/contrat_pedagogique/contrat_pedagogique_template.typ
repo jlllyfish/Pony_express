@@ -62,6 +62,11 @@
   reconnaissance: missing_data,
   retour_lieu: missing_data,
   retour_conditions: missing_data,
+  signature_envoi_nom: missing_data,
+  signature_envoi_prenom: "",
+  signature_accueil_nom: missing_data,
+  signature_accueil_prenom: "",
+  signature_participant_prenom: "",
   ..superfluous_arguments
  ) = [
 
@@ -323,19 +328,17 @@
   #englishStyling[The signatories confirm that they understood and approve the content of this agreement.]
   ]
 
-  #let signatures_dict = (
-    "Organisme d’envoi": organisation_envoi_nom,
-    "Organisme d’accueil": organisation_envoi_nom
-  )
-  
-  #let index = 1
-  #for tuteur in tuteurs_legaux {
-     signatures_dict.insert("Tuteur légal", tuteur.nom + " " + tuteur.prenom)
-    index = index + 1
-  }
-  #signatures_dict.insert("Participant", participant_nom + " " + participant_prenom )
+  #let tuteur(i, champ) = if tuteurs_legaux.len() > i {
+    tuteurs_legaux.at(i).at(champ)
+  } else { missing_data }
 
-  #signatures(signatures_dict)
+  #signatures((
+    ("Organisme d’envoi", signature_envoi_nom, signature_envoi_prenom),
+    ("Organisme d’accueil", signature_accueil_nom, signature_accueil_prenom),
+    (("Tuteur légal 1", tuteur(0, "nom"), tuteur(0, "prenom")),
+     ("Tuteur légal 2", tuteur(1, "nom"), tuteur(1, "prenom"))),
+    ("Participant", participant_nom, signature_participant_prenom),
+  ))
 ]
 
 ]

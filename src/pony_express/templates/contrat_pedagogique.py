@@ -146,6 +146,8 @@ REFERENCES = {
             "organisation_envoi_adresse": "Adresse",
             "organisation_envoi_email": "Mail",
             "organisation_envoi_telephone": "Telephone",
+            "envoi_direction_nom": "Nom_direction",
+            "envoi_direction_prenom": "Prenom_direction",
         },
     },
 }
@@ -280,6 +282,12 @@ def apply_data_transformation(data: dict) -> dict:
         transformed["responsables_accueil"] = accueil
     else:
         transformed.pop("responsables_accueil", None)
+    # signatures : direction de l'etablissement et responsable de l'organisme d'accueil
+    transformed["signature_envoi_nom"] = transformed.get("envoi_direction_nom", "")
+    transformed["signature_envoi_prenom"] = transformed.get("envoi_direction_prenom", "")
+    transformed["signature_accueil_nom"] = value(data, "accueil_resp_nom")
+    transformed["signature_accueil_prenom"] = value(data, "accueil_resp_prenom")
+    transformed["signature_participant_prenom"] = premier_prenom(value(data, "participant_prenom"))
     # colonne vide dans Grist : [donnee manquante] plutot qu'une case blanche
     for param in list(transformed):
         if param in STUDENT_DATA.__members__ and transformed[param] in ("", None):
@@ -309,6 +317,11 @@ def get_blocks(table: str, dossier_number) -> list[dict]:
         return _blocks_cache[table].get(int(dossier_number), [])
     except (TypeError, ValueError):
         return []
+
+
+def premier_prenom(prenoms: str) -> str:
+    """"Pauline, Marie, Gilda" -> "Pauline" (premier prenom seulement)."""
+    return prenoms.split(",")[0].strip()
 
 
 def value(row: dict, key: str) -> str:

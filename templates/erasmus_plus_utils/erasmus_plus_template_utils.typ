@@ -2,7 +2,7 @@
 
 #set text(font: "marianne")
 #let blue_line =  line(length: 100%, stroke: (paint: rgb("#333399")))
-#let black_line =  line(length: 85%, stroke: (paint: black))
+#let black_line =  line(length: 100%, stroke: (paint: black))
 
 // taille des numeros de titres (1, 2...) et de sous-titres (le 2 de 4.2)
 #let heading_number_size = 20pt
@@ -19,6 +19,12 @@
   text(blue, it)
 }
 
+#let label_size = 10pt              // intitules des lignes (corps : 11pt)
+#let label_translation_size = 8pt  // leur traduction
+#let label_row_gutter = 5pt        // espace entre l'intitule et sa traduction
+
+#let signature_bg = rgb("#f2f2f2")  // fond des blocs de signature
+#let signature_value_size = 9pt  // valeurs des signatures (corps : 11pt)
 #let chap_indent = 12%       // retrait du corps de texte
 #let subheading_indent = 16pt  // retrait supplementaire des sous-titres
 #let heading_size = 13pt      // titres (avant : 15pt)
@@ -61,11 +67,21 @@
   let width = 30%
   if wide_title {width = 40%}
 
-  let cells = ([*#title*], value)
-  if activate_translation{
-    cells.push(englishStyling(translate(title)))
-    if (is_translatable(value)) {
-      cells.push(englishStyling([_#translate(value)_]))
+  // intitule et traduction dans une seule cellule : l'espacement ne depend plus de la hauteur de la valeur
+  let label = {
+    set par(leading: label_row_gutter)
+    text(size: label_size, weight: "bold", title)
+    if activate_translation {
+      linebreak()
+      englishStyling(text(size: label_translation_size, translate(title)))
+    }
+  }
+  let contenu = {
+    set par(leading: label_row_gutter)
+    value
+    if activate_translation and is_translatable(value) {
+      linebreak()
+      englishStyling([_#translate(value)_])
     }
   }
 
@@ -73,8 +89,9 @@
     blue_line
     grid(
       columns: (width, 100%-width),
-      gutter: 8pt,
-      ..cells
+      column-gutter: 8pt,
+      align: top,
+      label, contenu
     )
   }
 }
@@ -119,15 +136,21 @@
 // Signatures //
 ////////////////
 
-#let signature(title, name, activate_translation: true, wide_title: true) = {
-  box(fill: rgb("#e5e5e5"), outset:(x: 6pt, y: 6pt),
+#let signature_name(nom, prenom) = if nom in (missing_data, "") {
+  custom_data(missing_data)
+} else {
+  custom_data(text(weight: "bold", upper(nom)) + if prenom not in (missing_data, "") [ #prenom ])
+}
+
+#let signature(title, name, prenom: "", activate_translation: true, wide_title: true) = {
+  box(fill: signature_bg, outset:(x: 6pt, y: 6pt),
   [
     === #title
     #form((
-        "Nom" : custom_data(name),
+        "Nom" : text(size: signature_value_size, signature_name(name, prenom)),
         "Date et lieu":"",
         "Signature":"",
-        
+
     ),
       activate_translation: activate_translation,
       wide_title: wide_title
@@ -135,17 +158,27 @@
   )
 }
 
-#let signatures(signataires, activate_translation: true) = {
+// une cellule = ("Titre", "Nom") ; ou plusieurs signataires alternatifs, separes par "ou" :
+//   (("Tuteur legal 1", "..."), ("Tuteur legal 2", "..."))
+#let signatures(cellules, activate_translation: true) = {
   let signatures_list = ()
-  for key in signataires.keys() { 
-    signatures_list.push(signature(
-      key, 
-      signataires.at(key), 
-      activate_translation: activate_translation
-      )
-    )
+  for cellule in cellules {
+    if type(cellule.at(0)) == str {
+      signatures_list.push(signature(cellule.at(0), cellule.at(1),
+        prenom: cellule.at(2, default: ""), activate_translation: activate_translation))
+    } else {
+      let bloc = ()
+      for signataire in cellule {
+        if bloc.len() > 0 {
+          bloc.push(align(center, "ou"))
+        }
+        bloc.push(signature(signataire.at(0), signataire.at(1),
+          prenom: signataire.at(2, default: ""), activate_translation: activate_translation))
+      }
+      signatures_list.push(stack(spacing: 20pt, ..bloc))
+    }
   }
-  grid(columns: (1fr, 1fr), 
+  grid(columns: (1fr, 1fr),
   gutter: 20pt,
   ..signatures_list
   )
@@ -246,12 +279,8 @@
     strong(it.body)
     
     if (activate_translation) {
-    let translation = translate(it)
-
-    if (translation != to-string(it.body)){
       linebreak()
-      englishStyling[#translation]
-    }    
+      englishStyling[#translate(it)]
     }
   }
 
