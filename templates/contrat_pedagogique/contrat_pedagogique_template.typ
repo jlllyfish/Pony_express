@@ -193,15 +193,15 @@
 
 = Suivi et tutorat du participant durant l’activité
 
+#chap[
+  #for tutoring in tutorings {
+    [- #tutoring]
+  }
+]
+
 == Personnes responsables au sein de l’organisme d’accueil
 
 #chap(level: 2)[
-
-  #intro[
-  La (les) personne(s) suivante(s) de l’organisme d’accueil est (sont) chargée(s) de présenter au participant ses activités et ses tâches au sein de l’organisme d’accueil, de lui fournir un soutien pratique, de suivre ses progrès d’apprentissage, de l’aider à atteindre les acquis d’apprentissage attendus et de l’aider à s’intégrer dans lesroutines quotidiennes et le contexte social de l’organisme d’accueil. 
-  
-  _#englishStyling[The following person(s) at the hosting organisation are tasked with introducing the participant to their activities and tasks at the hosting organisation, providing practical support, monitoring their learning progress, supporting them to achieve the expected learning outcomes, and helping them to integrate into the daily routines and the social context at the hosting organisation.]_
-  ]
 
   #forms(title_key: "Responsabilités", responsables_accueil.map(personne => (
     "Nom": personne.nom,
@@ -252,16 +252,6 @@
     "Téléphone":personne.telephone,
     "Fonction":personne.at("fonction", default: missing_data),
   )))
-]
-
-== Modalités de suivi et de tutorat
-
-#chap(level: 2)[
-
-    #for tutoring in tutorings {
-      [- #tutoring]
-    }
-  
 ]
 
 = Évaluation des acquis d’apprentissage
