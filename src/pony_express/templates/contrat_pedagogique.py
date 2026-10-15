@@ -93,7 +93,6 @@ JOINTES = {
         "accueil_resp_prenom": "prenom_responsable_organisme_d_accueil",
         "accueil_resp_email": "mail_responsable_organisme_d_accueil",
         "accueil_resp_telephone": "telephone_responsable_organisme_d_accueil",
-        "accueil_resp_fonction": "fonction_responsable_organisme_d_accueil",
         "accueil_resp_est_contact": "la_personne_responsable_de_l_organisme_d_accueil_est_egalement_la_personne_de_contact",
         "accueil_resp_est_tuteur": "la_personne_responsable_de_l_organisme_d_accueil_est_egalement_le_tuteur",
         "accueil_resp_est_urgence": "la_personne_responsable_de_l_organisme_d_accueil_est_egalement_le_contact_d_urgence",
@@ -104,17 +103,17 @@ JOINTES = {
         "accueil_contact_prenom": "prenom",
         "accueil_contact_email": "mail",
         "accueil_contact_telephone": "telephone",
-        "accueil_contact_fonction": "fonction",
         "accueil_tuteur_nom": "nom_1",
         "accueil_tuteur_prenom": "prenom_1",
         "accueil_tuteur_email": "mail_1",
         "accueil_tuteur_telephone": "numero_de_telephone",
-        "accueil_tuteur_fonction": "fonction_1",
         "accueil_urgence_nom": "nom_2",
         "accueil_urgence_prenom": "prenom_2",
         "accueil_urgence_email": "mail_2",
         "accueil_urgence_telephone": "numero_de_telephone_1",
-        "accueil_urgence_fonction": "fonction_2",
+        # Fonction (pas encore dans DN/Grist -> « [donnée manquante] ») : à ajouter ici
+        # "accueil_resp_fonction", "accueil_contact_fonction",
+        # "accueil_tuteur_fonction", "accueil_urgence_fonction"
     },
 }
 
