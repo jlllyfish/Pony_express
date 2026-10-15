@@ -129,7 +129,7 @@ BLOCS = {
             "prenom": "prenom",
             "email": "adresse_electronique",
             "telephone": "numero_de_telephone",
-            "responsabilites": "fonction",
+            "responsabilites": "intitule_du_poste",
         },
     ),
 }
