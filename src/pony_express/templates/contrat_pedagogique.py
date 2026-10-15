@@ -1,5 +1,4 @@
 import os
-from datetime import date
 from copy import deepcopy
 from enum import Enum
 
@@ -94,6 +93,7 @@ JOINTES = {
         "accueil_resp_prenom": "prenom_responsable_organisme_d_accueil",
         "accueil_resp_email": "mail_responsable_organisme_d_accueil",
         "accueil_resp_telephone": "telephone_responsable_organisme_d_accueil",
+        "accueil_resp_fonction": "fonction_responsable_organisme_d_accueil",
         "accueil_resp_est_contact": "la_personne_responsable_de_l_organisme_d_accueil_est_egalement_la_personne_de_contact",
         "accueil_resp_est_tuteur": "la_personne_responsable_de_l_organisme_d_accueil_est_egalement_le_tuteur",
         "accueil_resp_est_urgence": "la_personne_responsable_de_l_organisme_d_accueil_est_egalement_le_contact_d_urgence",
@@ -104,14 +104,17 @@ JOINTES = {
         "accueil_contact_prenom": "prenom",
         "accueil_contact_email": "mail",
         "accueil_contact_telephone": "telephone",
+        "accueil_contact_fonction": "fonction",
         "accueil_tuteur_nom": "nom_1",
         "accueil_tuteur_prenom": "prenom_1",
         "accueil_tuteur_email": "mail_1",
         "accueil_tuteur_telephone": "numero_de_telephone",
+        "accueil_tuteur_fonction": "fonction_1",
         "accueil_urgence_nom": "nom_2",
         "accueil_urgence_prenom": "prenom_2",
         "accueil_urgence_email": "mail_2",
         "accueil_urgence_telephone": "numero_de_telephone_1",
+        "accueil_urgence_fonction": "fonction_2",
     },
 }
 
@@ -129,7 +132,7 @@ BLOCS = {
             "prenom": "prenom",
             "email": "adresse_electronique",
             "telephone": "numero_de_telephone",
-            "responsabilites": "intitule_du_poste",
+            "fonction": "intitule_du_poste",
         },
     ),
 }
@@ -152,17 +155,9 @@ REFERENCES = {
     },
 }
 
-def annee_scolaire_courante(bascule_mois: int = 8) -> str:
-    """Annee scolaire en cours : 2026-2027 a partir du mois d'aout."""
-    today = date.today()
-    debut = today.year if today.month >= bascule_mois else today.year - 1
-    return f"{debut}-{debut + 1}"
-
-
 # Valeurs identiques pour tous les dossiers (remplacer par un texte fixe si besoin)
 CONSTANTES = {
-    "annee_scolaire": annee_scolaire_courante(),
-    "participant_niveau_cerp": "Niveau 5",
+    "format_mobilite": "Activité de mobilité physique",
 }
 
 # Section 8.1 : une fiche par personne distincte de l'organisme d'accueil
@@ -191,10 +186,8 @@ TUTEURS = [
     },
 ]
 
-# Calculés dans apply_data_transformation : pays_ville, tuteurs_legaux
-# Pas encore dans Grist (-> « [donnée manquante] ») :
-#   personnel_qualification, personnel_niveau_cerp,
-#   responsables_envoi, responsables_accueil
+# Calculés dans apply_data_transformation : pays_ville, tuteurs_legaux,
+#   participant_premier_prenom, responsables_envoi, responsables_accueil
 
 
 # =====================================================================
@@ -287,7 +280,8 @@ def apply_data_transformation(data: dict) -> dict:
     transformed["signature_envoi_prenom"] = transformed.get("envoi_direction_prenom", "")
     transformed["signature_accueil_nom"] = value(data, "accueil_resp_nom")
     transformed["signature_accueil_prenom"] = value(data, "accueil_resp_prenom")
-    transformed["signature_participant_prenom"] = premier_prenom(value(data, "participant_prenom"))
+    transformed["participant_premier_prenom"] = premier_prenom(value(data, "participant_prenom"))
+    transformed["signature_participant_prenom"] = transformed["participant_premier_prenom"]
     # colonne vide dans Grist : [donnee manquante] plutot qu'une case blanche
     for param in list(transformed):
         if param in STUDENT_DATA.__members__ and transformed[param] in ("", None):
@@ -441,12 +435,15 @@ def get_responsables_accueil(data: dict) -> list[dict]:
         if any(is_true(data, drapeau) for drapeau in memes):
             continue
         person = {
-            "nom": value(data, prefixe + "_nom"),
+            "nom": value(data, prefixe + "_nom").upper(),
             "prenom": value(data, prefixe + "_prenom"),
             "email": value(data, prefixe + "_email"),
             "telephone": value(data, prefixe + "_telephone"),
             "responsabilites": role,
         }
+        fonction = value(data, prefixe + "_fonction")
+        if fonction:  # sinon « [donnée manquante] »
+            person["fonction"] = fonction
         if person["nom"]:
             people.append(person)
     return people

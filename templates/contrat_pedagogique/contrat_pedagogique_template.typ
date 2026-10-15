@@ -6,7 +6,7 @@
 #let contrat_pedagogique(
   code_projet: missing_data,
   type_activite: missing_data,
-  annee_scolaire: missing_data,
+  format_mobilite: "Activité de mobilité physique",
   date_debut: missing_data,
   date_fin: missing_data,
   pays_ville: missing_data,
@@ -19,7 +19,7 @@
   participant_email: missing_data,
   participant_telephone: missing_data,
   participant_qualification: missing_data,
-  participant_niveau_cerp: missing_data,
+  participant_premier_prenom: missing_data,
   tuteurs_legaux: (
     (nom: missing_data,
     prenom: missing_data,
@@ -34,13 +34,12 @@
   organisation_accueil_adresse: missing_data,
   organisation_accueil_email: missing_data,
   organisation_accueil_telephone: missing_data,
-  personnel_qualification: missing_data,
-  personnel_niveau_cerp: missing_data,
   responsables_accueil: (
     (nom: missing_data,
     prenom: missing_data,
     email: missing_data,
     telephone: missing_data,
+    fonction: missing_data,
     responsabilites: missing_data),
   ),
   responsables_envoi: (
@@ -48,6 +47,7 @@
     prenom: missing_data,
     email: missing_data,
     telephone: missing_data,
+    fonction: missing_data,
     responsabilites: missing_data),
   ),
   accompagnants : (
@@ -55,6 +55,7 @@
     prenom: missing_data,
     email: missing_data,
     telephone: missing_data,
+    fonction: missing_data,
     responsabilites: missing_data),
   ),
   evaluation_format: missing_data,
@@ -77,17 +78,7 @@
   doc
 )
 
-= Objectifs du contrat pédagogique
-
-#chap[
-    
-    #intro[
-    Ce contrat pédagogique définit les conditions et les acquis d’apprentissage attendus d’une mobilité à des fins d’apprentissage organisée dans le cadre du programme Erasmus+. Les parties prenantes à ce contrat doivent se conformer aux règles et aux standards de qualité du programme.
-
-    _#englishStyling[This learning agreement defines the conditions and learning outcomes expected from a learning mobility organised as part of the Erasmus+ programme. The parties to this contract must comply with the programme’s rules and quality standards]_
-    ]
-
-]
+#text(size: 13pt, weight: "bold")[#participant_premier_prenom #participant_nom]
 
 = Information sur la mobilité à des fins d’apprentissage
 #chap[
@@ -102,17 +93,6 @@
 
 ]
 
-
-= Parties prenantes au contrat pédagogique
-#chap[
-    
-    #intro[
-    Le contrat pédagogique est conclu entre le participant à la mobilité à des fins d’apprentissage, l’organisme d’envoi et l’organisme d’accueil. 
-    
-    _#englishStyling[The learning agreement is concluded between the participant in the learning mobility, the sending organisation and the hosting organisation.]_
-    ]
-
-]
 
 = Participant à la mobilité à des fins d’apprentissage
 #chap[
@@ -178,21 +158,7 @@
   === Apprenant
   #form((
     "Titre qualification / profession": participant_qualification,
-    "Année scolaire": annee_scolaire,
-    "Niveau dans le Cadre Européen des Certifications": participant_niveau_cerp
-  ),wide_title: true)
-
-  #intro[
-  Au sein de l’organisme d’envoi, le participant occupe actuellement la fonction de :
-  
-  #englishStyling[At the sending organisation, the participant is currently working in the following capacity :]
-  ]
-
-  === Personnel
-  #form((
-    "Titre qualification / profession":personnel_qualification,
-    "Année scolaire":annee_scolaire,
-    "Niveau dans le Cadre Européen des Certifications":personnel_niveau_cerp
+    "Format de mobilité": format_mobilite,
   ),wide_title: true)
 
 ]
@@ -242,6 +208,7 @@
     "Prénom":personne.prenom,
     "Adresse mail":personne.email,
     "Téléphone":personne.telephone,
+    "Fonction":personne.at("fonction", default: missing_data),
     "Responsabilités":personne.responsabilites,
   )))
 
@@ -276,12 +243,14 @@
   #englishStyling[The following person(s) will accompany the participant during their mobility period]
   ]
 
-  #forms(title_key: "Responsabilités", accompagnants.map(personne => (
+  // intertitre « Accompagnateur 1, 2… » ; la fonction passe dans le tableau
+  #forms(title_key: "Titre", accompagnants.enumerate().map(((i, personne)) => (
+    "Titre": if accompagnants.len() == 1 [Accompagnateur] else [Accompagnateur #(i + 1)],
     "Nom": personne.nom,
     "Prénom":personne.prenom,
     "Adresse mail":personne.email,
     "Téléphone":personne.telephone,
-    "Responsabilités":personne.responsabilites,
+    "Fonction":personne.at("fonction", default: missing_data),
   )))
 ]
 

@@ -13,6 +13,7 @@
 
   // A B C
   "Accompagnateurs": "Accompanying persons",
+  "Activité de mobilité physique": "Physical mobility activity",
   "Acquis d’apprentissage": "Learning outcomes",
   "Année scolaire": "School year",
   "Agent": "Agent",
@@ -30,6 +31,8 @@
   "Enseignement et formation professionnels": "Vocational education and training",
   "entretien": "interview",
   "Évaluation des acquis d’apprentissage": "Evaluation of des learning acquis outcomes",
+  "Fonction": "Job title",
+  "Format de mobilité": "Mobility format",
   "Information sur la mobilité à des fins d’apprentissage": "Information about the learning mobility",
 
   // L M N O
