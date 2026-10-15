@@ -248,6 +248,9 @@ def apply_data_transformation(data: dict) -> dict:
     set_date(transformed, "date_debut")
     set_date(transformed, "date_fin")
     set_joined(transformed, "pays_ville", [value(data, "pays"), value(data, "ville")])
+    # une puce par ligne saisie dans DN
+    for key in ("evaluation_format", "evaluation_criteres"):
+        set_list(transformed, key, value(data, key).split("\n"))
     set_people(
         transformed, "tuteurs_legaux", [data] * len(TUTEURS), TUTEURS, required="nom"
     )

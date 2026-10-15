@@ -3,6 +3,9 @@
 // taille des paragraphes d'introduction (FR + traduction) sous les titres
 #let intro(body) = text(size: 8pt, body)
 
+// texte sur plusieurs lignes (liste de lignes) : une puce par ligne, sans saut de ligne
+#let puces(lignes) = if type(lignes) == array { list(tight: true, ..lignes) } else { lignes }
+
 #let contrat_pedagogique(
   code_projet: missing_data,
   type_activite: missing_data,
@@ -251,10 +254,10 @@
 = Évaluation des acquis d’apprentissage
 #chap[
   === Format et procédures d’évaluation
-  #evaluation_format
+  #puces(evaluation_format)
 
   === Critères d’évaluation
-  #evaluation_criteres
+  #puces(evaluation_criteres)
 ]
 
 = Reconnaissance des acquis d’apprentissage
