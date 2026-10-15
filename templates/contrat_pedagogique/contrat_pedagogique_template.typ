@@ -218,12 +218,6 @@
 == Personnes responsables au sein de l’organisme d’envoi
 
 #chap(level: 2)[
-  #intro[
-  La (les) personne(s) suivante(s) de l’organisme d’envoi est (sont) chargée(s) de suivre les progrès des participants et de fournir un contenu ou un soutien pratique de la part de l’organisme d’envoi.
-  
-  #englishStyling[The following person(s) at the sending organisation are tasked with following the participants' progress and providing content or practical support from the side of the sending organisation.]
-  ]
-
   #forms(title_key: "Responsabilités", responsables_envoi.map(personne => (
     "Nom": personne.nom,
     "Prénom":personne.prenom,
