@@ -1,4 +1,4 @@
-#import "../erasmus_plus_utils/erasmus_plus_template_utils.typ" : * 
+#import "../erasmus_plus_utils/erasmus_plus_editorial.typ" : * 
 
 #let contrat_pedagogique_personnel(
   participant_nom: missing_data,

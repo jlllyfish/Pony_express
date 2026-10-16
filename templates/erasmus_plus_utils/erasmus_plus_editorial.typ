@@ -10,7 +10,8 @@
 #let filet = rgb("#D9DCE6")
 #let encre = rgb("#1D2233")
 
-#let num_col = 1.5cm          // colonne des numéros de titres (et retrait du corps)
+#let num_col = 1.5cm          // colonne des numéros de titres, dans la marge gauche
+#let outdent(it) = pad(left: -num_col, it)  // pleine largeur (titres, page de garde)
 #let label_col = 34%          // colonne des intitulés dans les fiches
 #let label_col_wide = 42%
 
@@ -20,8 +21,17 @@
 #let en(t) = text(fill: gris, style: "italic", t)
 #let tr(t, activate: true) = if activate and is_translatable(t) { translate(t) } else { none }
 
+// données insérées depuis Grist (texte fixe du contrat en noir) ; manquante en rouge
+#let custom_data(it) = if it == missing_data { text(fill: rgb("#C0392B"), it) } else { text(fill: navy, it) }
+
+// titre intermédiaire dans le corps du document (ex : annexes)
+#let erasmus_title(title, translation: "") = outdent(block(above: 18pt, below: 12pt, {
+  text(16pt, weight: "bold", fill: navy, title)
+  if translation != "" { linebreak(); text(13pt, weight: "light", fill: gris, translation) }
+}))
+
 // ── Corps de section ─────────────────────────────────────────────────
-#let chap(it, level: 1) = block(width: 100%, inset: (left: num_col), it)
+#let chap(it, level: 1) = block(width: 100%, it)
 
 // ── Fiches ───────────────────────────────────────────────────────────
 #let form_label(title, activate_translation) = {
@@ -95,6 +105,8 @@
 #let signature(title, name, prenom: "", activate_translation: true) = block(
   breakable: false, width: 100%, height: 2.3cm,
   stroke: (left: 2pt + jaune), inset: (left: 10pt, y: 4pt), {
+    set par(justify: false)
+    set text(hyphenate: false)
     text(8pt, weight: "bold", title)
     let t = tr(title, activate: activate_translation)
     if t != none { h(4pt); text(7pt, en(t)) }
@@ -109,8 +121,10 @@
 
 // une cellule = ("Titre", "Nom", "Prénom") ; ou plusieurs signataires alternatifs, séparés par « ou » :
 //   (("Tuteur légal 1", ...), ("Tuteur légal 2", ...))
+//   ou un dictionnaire { "Titre": nom, ... }
 #let signatures(cellules, activate_translation: true) = {
-  let blocs = cellules.map(cellule => {
+  let items = if type(cellules) == dictionary { cellules.pairs() } else { cellules }
+  let blocs = items.map(cellule => {
     if type(cellule.at(0)) == str {
       signature(cellule.at(0), cellule.at(1), prenom: cellule.at(2, default: ""),
         activate_translation: activate_translation)
@@ -126,7 +140,7 @@
 // ── Page de garde ────────────────────────────────────────────────────
 // cles : ((intitulé, valeur), ...) — bandeau de chiffres clés (traductions par le dictionnaire)
 #let couverture(kicker: "ERASMUS+", title: "", translation: "", participant: none,
-                code: none, cles: (), activate_translation: true) = {
+                code: none, cles: (), activate_translation: true) = outdent({
   box(fill: jaune, inset: (x: 6pt, y: 3pt),
     text(7.5pt, weight: "bold", fill: navy, tracking: 0.1em, kicker))
   v(6pt)
@@ -148,10 +162,12 @@
   set par(justify: false)
   block(width: 100%, stroke: (top: 2pt + navy, bottom: 0.5pt + filet), inset: (y: 10pt), below: 14pt,
     grid(columns: (1.4fr,) + (1fr,) * calc.max(cles.len() - 1, 0), column-gutter: 12pt, ..cles.map(cle)))
-}
+})
 
 // ── Mise en page ─────────────────────────────────────────────────────
-#let erasmus_plus_layout(title: "", translation: "", activate_translation: true, header_note: none, doc) = {
+// show_title : titre en tête de la première page (false si le template appelle #couverture)
+#let erasmus_plus_layout(title: "", translation: "", activate_translation: true, header_note: none,
+                         show_title: true, doc) = {
   set text(font: "Marianne", size: 9.5pt, fill: encre)
   set par(leading: 0.55em, justify: true)
   set list(marker: text(fill: navy, "•"))
@@ -160,23 +176,23 @@
 
   set page(
     paper: "a4",
-    margin: (x: 1.8cm, top: 3.1cm, bottom: 1.8cm),
-    header: {
+    margin: (left: 1.8cm + num_col, right: 1.8cm, top: 3.1cm, bottom: 1.8cm),
+    header: outdent({
       grid(columns: (1fr, auto), align: (left + horizon, right + horizon),
         image("assets/header_logo.png", height: 1.15cm, alt: "Move occitanie over the world by ENSFEA"),
         image("assets/footer_logo.png", height: 0.75cm,
           alt: "Erasmus +, enrichit les vies, ouvre les esprits. Financé par l'Union Européenne"))
       v(-2pt)
       line(length: 100%, stroke: 0.5pt + filet)
-    },
-    footer: text(7.5pt, fill: gris)[
-      #header_note #h(1fr) #title · #context counter(page).display("1/1", both: true)],
+    }),
+    footer: outdent(text(7.5pt, fill: gris)[
+      #header_note #h(1fr) #title · #context counter(page).display("1/1", both: true)]),
   )
 
   set heading(numbering: "1.1")
 
   show heading: set par(justify: false)
-  show heading.where(level: 1): it => block(above: 16pt, below: 6pt, grid(
+  show heading.where(level: 1): it => block(above: 16pt, below: 6pt, outdent(grid(
     columns: (num_col, 1fr),
     text(24pt, weight: "light", fill: navy, counter(heading).display()),
     {
@@ -186,9 +202,9 @@
       if t != none { h(6pt); text(9pt, en(t)) }
       v(-4pt)
       line(length: 100%, stroke: 1.2pt + navy)
-    }))
+    })))
 
-  show heading.where(level: 2): it => block(above: 12pt, below: 8pt, inset: (left: num_col), {
+  show heading.where(level: 2): it => block(above: 12pt, below: 8pt, {
     text(10pt, weight: "bold", fill: navy, counter(heading).display() + h(5pt) + it.body)
     let t = tr(it.body, activate: activate_translation)
     if t != none { h(5pt); text(8pt, en(t)) }
@@ -199,6 +215,14 @@
 
   // un titre ne reste jamais seul en bas de page (règle placée après les autres : appliquée en premier)
   show heading: it => block(sticky: true, it)
+
+  if show_title and title != "" {
+    outdent(block(below: 18pt, {
+      set par(justify: false)
+      text(22pt, weight: "bold", fill: navy, tracking: -0.01em, title)
+      if translation != "" { linebreak(); v(-4pt); text(13pt, weight: "light", fill: gris, translation) }
+    }))
+  }
 
   doc
 }

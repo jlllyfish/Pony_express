@@ -78,6 +78,7 @@
 #show: doc => erasmus_plus_layout(
   header_note: code_projet,
   title: "Contrat pédagogique",
+  show_title: false,
   doc
 )
 

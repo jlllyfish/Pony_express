@@ -1,4 +1,4 @@
-#import "../erasmus_plus_utils/erasmus_plus_template_utils.typ" : * 
+#import "../erasmus_plus_utils/erasmus_plus_editorial.typ" : * 
 #import "../erasmus_plus_utils/legal_template_utils.typ" : * 
 #import "../erasmus_plus_utils/erasmus_translation.typ" : * 
 
