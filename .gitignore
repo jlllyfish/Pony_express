@@ -9,3 +9,4 @@ shell.nix
 __pycache__/
 .venv/
 .env
+colonnes_grist.txt
