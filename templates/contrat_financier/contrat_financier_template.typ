@@ -9,6 +9,20 @@
   date_debut: missing_data,
   date_fin: missing_data,
   participant_nom_complet: missing_data,
+  participant_nom: missing_data,
+  participant_premier_prenom: "",
+  pays_ville: missing_data,
+  duree: missing_data,
+  tuteur_1_nom: missing_data,
+  tuteur_1_prenom: "",
+  envoi_direction_nom: missing_data,
+  envoi_direction_prenom: "",
+  assurance_responsable: missing_data,
+  numero_police_assurance: missing_data,
+  banque_nom: missing_data,
+  banque_titulaire: missing_data,
+  banque_iban: missing_data,
+  banque_bic: missing_data,
   participant_date_naissance: missing_data,
   participant_adresse: missing_data,
   participant_telephone: missing_data,
@@ -39,9 +53,26 @@
  ) = [
 
 #show: doc => erasmus_plus_layout(
-  title:[Contrat financier Erasmus+ pour la mobilité des individus], 
+  title: "Contrat financier Erasmus+ pour la mobilité des individus",
+  header_note: code_projet,
   activate_translation: false,
+  show_title: false,
   doc
+)
+
+#let parts = if type(code_projet) == str { code_projet.split("-") } else { () }
+#couverture(
+  kicker: if parts.len() >= 5 [ERASMUS+ #h(3pt)·#h(3pt) #parts.at(3) #parts.at(4)] else [ERASMUS+],
+  title: "Contrat financier Erasmus+ pour la mobilité des individus",
+  participant: [#participant_premier_prenom #text(weight: "bold", participant_nom)],
+  code: code_projet,
+  cles: (
+    ("Destination", pays_ville),
+    ("Début", date_debut),
+    ("Fin", date_fin),
+    ("Durée", duree),
+  ),
+  activate_translation: false,
 )
   
 
@@ -88,6 +119,15 @@
 
   Compte bancaire sur lequel le soutien financier sera versé #footnote[Option pour les participants bénéficiant d'un soutien financier Erasmus+, à l'exception de ceux pour lesquels l'article 3.4 Option 2 s'applique.] : les données du compte bancaire sont annexées en pièce-jointe.
 
+  #form((
+      "Nom de la banque": custom_data(banque_nom),
+      "Nom du titulaire": custom_data(banque_titulaire),
+      "IBAN": custom_data(banque_iban),
+      "BIC": custom_data(banque_bic),
+    ),
+    activate_translation: false,
+  )
+
   Les parties mentionnées ci-dessus ont accepté de conclure ce contrat.
 
   Le contrat comprend :
@@ -100,7 +140,7 @@
 
 = CONDITIONS GÉNÉRALES
 
-#article[objet du contrat]
+#article[Objet du contrat]
 
 #mention[
 Le présent accord définit les droits, obligations et conditions applicables au soutien financier accordé pour la réalisation d’une activité de mobilité dans le cadre du programme Erasmus+.
@@ -119,7 +159,7 @@ Je postule sur Envergo mais pense etre davantage pertinente sur le futur projet 
 Le participant accepte le soutien ou la prestation de services tel que spécifié à l’article 3 et s’engage à réaliser l’activité de mobilité décrite à l’annexe. 
 ]
 
-#article[entree en vigueur du contrat et duree de la mobilite]
+#article[Entrée en vigueur du contrat et durée de la mobilité]
 
 #mention[
 Le contrat financier entre en vigueur à la date de signature de la dernière des deux parties.
@@ -130,7 +170,7 @@ Le contrat financier couvrira la période #footnote[Cette période comprend les 
 Dont #custom_data(duree_voyage) jours de voyage
 ]
 
-#article[soutien financier]
+#article[Soutien financier]
 
 #mention[
 Le soutien financier est calculé selon les règles de financement indiquées dans le guide du programme Erasmus+ (version 2025).
@@ -179,7 +219,7 @@ Si l’organisation accepte de prolonger la période de mobilité par écrit, le
 Le participant est en droit de recevoir un remboursement de 100 % des coûts éligibles au titre du soutien pour l’inclusion. Le remboursement des frais encourus liés au soutien pour l’inclusion, le cas échéant, sera effectué sur la base des justificatifs fournis par le participant.
 ]
 
-#article[eligibilite des couts]
+#article[Éligibilité des coûts]
 
 #mention[
 Pour être éligibles, les coûts doivent être effectivement utilisés ou produits par le participant au cours de la période visée à l'article 2 et/ou être nécessaires à la mise en œuvre de l'activité visée dans l'annexe. Les coûts doivent être conformes à la législation nationale applicable en matière de fiscalité, de travail et de sécurité sociale.
@@ -196,7 +236,7 @@ Le soutien financier ne peut être utilisé pour couvrir les coûts d'activités
   Le participant ne peut pas demander le remboursement des pertes liées à la monnaie de change ou des frais bancaires facturés par la banque du participant, pour les transferts effectués par l'organisme qui l’envoi.
 ]
 
-#article[modalités de paiements #footnote[Ne s’applique que si l’Option 1 ou 3 de l’article 3.4 est sélectionnée.]]
+#article[Modalités de paiement #footnote[Ne s’applique que si l’Option 1 ou 3 de l’article 3.4 est sélectionnée.]]
 
 #mention[
    Dans les 30 jours calendaires suivant la signature du contrat par les deux parties ou à la réception de la confirmation d’arrivée, et au plus tard à la date de début de la période de mobilité telle que spécifiée à l’article 2.2, un préfinancement est versé au participant à hauteur de : #custom_data(accompte_pourcentage) % #footnote[Pourcentage entre 50% et 100%, au choix de l’organisme d’envoi.] du montant spécifié à l’article 3.
@@ -208,11 +248,11 @@ Le soutien financier ne peut être utilisé pour couvrir les coûts d'activités
   Dans le cas où le participant ne fournit pas les pièces justificatives dans les temps impartis fixés par l’organisme d’envoi, un report de paiement du préfinancement peut être exceptionnellement accepté, sur la base de raisons justifiées.
 ]
 
-#article[recouvrement]
+#article[Recouvrement]
 
 #mention[Le soutien financier ou une partie de celui-ci sera récupéré par l'organisation d'envoi si le participant ne respecte pas les termes de la convention. Si le participant met fin à la mobilité avant son terme, ce dernier devra restituer le montant de la subvention déjà versé, sauf accord contraire avec l'organisme d'envoi. L’accord sera signalé par l'organisme d'envoi et accepté par l'Agence nationale.]
 
-#article[assurance]
+#article[Assurance]
 
 #mention[
   L’organisme s’assurera que le participant dispose d’une couverture d’assurance adéquate, soit en fournissant lui-même l’assurance, soit en concluant un accord avec l’organisme d’accueil pour que ce dernier fournisse l’assurance, soit en fournissant au participant les informations et le soutien appropriés pour qu’il puisse souscrire une assurance par lui-même #footnote[Dans le cas où l’organisme d’accueil est identifié comme la partie responsable à l’article 7.3, un document spécifique sera joint à ce contrat financier définissant les dispositions en matière d’assurance et incluant le consentement de l’organisme d’accueil.].
@@ -224,17 +264,10 @@ Le soutien financier ne peut être utilisé pour couvrir les coûts d'activités
 
 #mention[La partie responsable de la souscription de l’assurance est#footnote[En cas d’assurances distinctes, les parties responsables peuvent être différentes et seront énumérées ici en fonction de leurs responsabilités respectives.]
 
-  #if (option_prise_en_charge == "Option 1") [
-    L’organisme d’envoi
-  ] else if (option_prise_en_charge == "Option 2") [
-   le participant
-  ] else [
-    l'organisme d’accueil 
-  ]
+ : #custom_data(assurance_responsable)
   #form((
       "Compagnie d'assurance": custom_data(compagnie_assurance),
-      "Numéro d'assurance": custom_data(numero_assurance),
-      "Police d'assurance": custom_data(police_assurance),
+      "Numéro et police d'assurance": custom_data(numero_police_assurance),
     ),
     activate_translation: false,
     wide_title: true
@@ -252,13 +285,13 @@ Le participant doit effectuer le test de langue OLS dans les délais définis pa
 #mention[Le bénéficiaire fournit au participant un accès à la plateforme OLS dans les délais requis afin de lui permettre de se conformer aux exigences ci-dessus. Le participant informe immédiatement l’organisme s’il rencontre des problèmes techniques, ou tout autre problème, lors de l’utilisation de la plateforme OLS.]
 
 
-#article[rapport du participant (questionnaire UE)]
+#article[Rapport du participant (questionnaire UE)]
 
 #mention[Le bénéficiaire fournit au participant un accès à la plateforme OLS dans les délais requis afin de lui permettre de se conformer aux exigences ci-dessus. Le participant informe immédiatement l’organisme s’il rencontre des problèmes techniques, ou tout autre problème, lors de l’utilisation de la plateforme OLS.]
 
 #mention[Un questionnaire complémentaire en ligne pourra être envoyé au participant afin de rendre pleinement compte de la reconnaissance de l’expérience de mobilité.]
 
-#article[ethique et valeurs]
+#article[Éthique et valeurs]
 
 #mention[L’activité de mobilité doit être menée en conformité avec les grands principes éthiques et le droit européen, international et national en vigueur.]
 
@@ -266,7 +299,7 @@ Le participant doit effectuer le test de langue OLS dans les délais définis pa
 
 #mention[Si un participant manque à l’une des obligations citées dans le présent article, le soutien financier peut être réduit ou ne pas être versé.]
 
-#article[Protection des donnees]
+#article[Protection des données]
 
 #mention[Toute donnée fournie dans ce contrat sera traitée sous la responsabilité du contrôleur de données identifié dans la déclaration de confidentialité, conformément à la législation applicable en matière de récupération des données, en particulier le règlement 2018/1725#footnote[Regulation (EU) 2018/1725 of the European Parliament and of the Council of 23 October 2018 on the protection of natural persons with regard to the processing of personal data by the Union institutions, bodies, offices and agencies and on the free movement of such data, and repealing Regulation (EC) No 45/2001 and Decision No 1247/2002/EC.] et les lois nationales connexes sur la protection des données, et aux fins énoncées dans la déclaration de confidentialité disponible à l’adresse suivante : #link("https://webgate.ec.europa.eu/erasmus-esc/index/privacy-statement")]
 
@@ -274,7 +307,7 @@ Le participant doit effectuer le test de langue OLS dans les délais définis pa
 
 #mention[Le participant peut, sur demande écrite, avoir accès à ses données personnelles et corriger toute information inexacte ou incomplète. Le participant adressera toute question concernant le traitement de ses données personnelles à l’organisme d’envoi et/ou à l’Agence nationale. Le participant peut déposer plainte contre le traitement de ses données personnelles auprès du Contrôleur européen de la protection des données en ce qui concerne l’utilisation des données par la Commission européenne.]
 
-#article[suspension du contrat]
+#article[Suspension du contrat]
 
 #mention[Le contrat peut être suspendu à l’initiative du participant ou de l’organisme si des circonstances exceptionnelles – notamment de force majeure (voir article 16) – en rendent l’exécution impossible ou excessivement difficile. La suspension prend effet au jour convenu par notification écrite des parties. Le contrat peut être rétabli par la suite.]
 
@@ -292,7 +325,7 @@ Le participant doit effectuer le test de langue OLS dans les délais définis pa
 
 #mention[La suspension n'affecte pas le droit de l'organisme de résilier le contrat (voir article 13).]
 
-#article[resiliation du contrat]
+#article[Résiliation du contrat]
 
 #mention[Le contrat peut être résilié par l’une ou l’autre des parties si des circonstances surviennent qui rendent l’exécution de l’accord impraticable, impossible ou excessivement difficile.]
 
@@ -306,19 +339,19 @@ Le participant doit effectuer le test de langue OLS dans les délais définis pa
 
 #mention[Le participant ne peut prétendre à des dommages et intérêts du fait de la résiliation par l'organisme.]
 
-#article[controles et audits]
+#article[Contrôles et audits]
 
 #mention[Les contractants s’engagent à fournir toute information détaillée demandée par la Commission européenne, l’Agence nationale française ou par tout autre organisme extérieur autorisé par la Commission européenne ou l’Agence nationale française à contrôler que la période de mobilité et les dispositions prévues au contrat soient ou aient été correctement mises en œuvre.]
 
 #mention[Toute constatation relative au contrat peut donner lieu aux mesures prévues à l'article 6 ou à d'autres actions en justice dans les conditions prévues par le droit national applicable.]
 
-#article[dommages et interets]
+#article[Dommages et intérêts]
 
 #mention[Chaque partie contractante décharge l’autre partie contractante de toute responsabilité civile pour les dommages subis par elle-même ou par son personnel du fait de l’exécution du présent contrat, dans la mesure où ces dommages ne sont pas dus à une faute grave et intentionnelle de l’autre partie contractante ou de son personnel.]
 
 #mention[L’Agence nationale française, la Commission européenne ou leurs personnels ne seront pas tenus pour responsables en cas d’action de réclamation au titre du contrat relative à tout dommage causé pendant l’exécution de la période de mobilité. En conséquence, l’Agence nationale française ou la Commission européenne n’examinera aucune demande d’indemnisation ou de remboursement accompagnant une telle réclamation.]
 
-#article[force majeure]
+#article[Force majeure]
 
 #mention[Une partie ne pouvant remplir ses obligations contractuelles en raison d’un cas de force majeure ne peut être tenue responsable de leur infraction.]
 
@@ -333,12 +366,12 @@ Le participant doit effectuer le test de langue OLS dans les délais définis pa
 
 #mention[Les parties doivent immédiatement prendre toutes les mesures nécessaires pour limiter les dommages dus à la force majeure et faire de leur mieux pour reprendre la mise en œuvre de l'action dès que possible.]
 
-#article[loi applicable et tribunal competent]
+#article[Loi applicable et tribunal compétent]
 
 #mention[Le présent contrat est régi par le droit français.]
 #mention[Le tribunal compétent, déterminé conformément à la législation nationale applicable, aura la compétence exclusive pour constater tout litige entre l’organisme et le participant concernant l’interprétation, l’application ou la validité de ce contrat, si ce litige ne peut pas être réglé à l’amiable.]
 
-#article[entree en vigueur]
+#article[Entrée en vigueur]
 #mention[Le contrat entrera en vigueur à la dernière date de signature par les parties.]
 
 
@@ -346,10 +379,12 @@ Le participant doit effectuer le test de langue OLS dans les délais définis pa
 = Signatures
 
 #signatures((
-  "Participant": participant_nom_complet,
-  "Tuteur légal": participant_nom_complet,
-  "Organisme":organisme_envoi_nom,
-), activate_translation: false)
+  ("Organisme d’envoi", envoi_direction_nom, envoi_direction_prenom, organisme_envoi_nom,
+    organisme_envoi_representant_fonction),
+  ("Participant", participant_nom, participant_premier_prenom),
+// tuteur légal seulement pour un participant mineur (nom renseigné)
+) + if tuteur_1_nom != missing_data { (("Tuteur légal", tuteur_1_nom, tuteur_1_prenom),) } else { () },
+activate_translation: false)
 
 
 #pagebreak()

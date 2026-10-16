@@ -21,8 +21,8 @@
 #let en(t) = text(fill: gris, style: "italic", t)
 #let tr(t, activate: true) = if activate and is_translatable(t) { translate(t) } else { none }
 
-// données insérées depuis Grist (texte fixe du contrat en noir) ; manquante en rouge
-#let custom_data(it) = if it == missing_data { text(fill: rgb("#C0392B"), it) } else { text(fill: navy, it) }
+// données insérées depuis Grist : noir gras ; manquante en rouge
+#let custom_data(it) = if it == missing_data { text(fill: rgb("#C0392B"), it) } else { text(fill: black, weight: "bold", it) }
 
 // titre intermédiaire dans le corps du document (ex : annexes)
 #let erasmus_title(title, translation: "") = outdent(block(above: 18pt, below: 12pt, {
@@ -109,7 +109,7 @@
   text(7pt, fill: gris)[#label #if activate_translation and is_translatable(label) [· #en(translate(label))]]
 }
 
-#let signature(title, name, prenom: "", organisme: none, activate_translation: true) = block(
+#let signature(title, name, prenom: "", organisme: none, fonction: none, activate_translation: true) = block(
   breakable: false, width: 100%,
   stroke: (left: 2pt + jaune), inset: (left: 10pt, y: 4pt), {
     set par(justify: false)
@@ -120,11 +120,12 @@
     linebreak()
     if organisme != none { text(9.5pt, weight: "medium", fill: navy, organisme); linebreak() }
     text(9pt, signature_name(name, prenom))
+    if fonction != none { linebreak(); text(8.5pt, fill: gris, fonction) }
     zone_signature("Date et lieu", 0.9cm, activate_translation)
     zone_signature("Signature et cachet", 3.2cm, activate_translation)
   })
 
-// une cellule = ("Titre", "Nom", "Prénom"[, "Organisme"]) ; ou plusieurs signataires alternatifs, séparés par « ou » :
+// une cellule = ("Titre", "Nom", "Prénom"[, "Organisme"[, "Fonction"]]) ; ou plusieurs signataires alternatifs, séparés par « ou » :
 //   (("Tuteur légal 1", ...), ("Tuteur légal 2", ...))
 //   ou un dictionnaire { "Titre": nom, ... }
 #let signatures(cellules, activate_translation: true) = {
@@ -132,7 +133,8 @@
   let blocs = items.map(cellule => {
     if type(cellule.at(0)) == str {
       signature(cellule.at(0), cellule.at(1), prenom: cellule.at(2, default: ""),
-        organisme: cellule.at(3, default: none), activate_translation: activate_translation)
+        organisme: cellule.at(3, default: none), fonction: cellule.at(4, default: none),
+        activate_translation: activate_translation)
     } else {
       stack(spacing: 6pt, ..cellule.map(s => signature(s.at(0), s.at(1), prenom: s.at(2, default: ""),
         activate_translation: activate_translation)).intersperse(text(8pt, fill: gris, "ou")))
@@ -149,11 +151,16 @@
                 code: none, cles: (), activate_translation: true) = outdent({
   text(8pt, weight: "bold", fill: navy, tracking: 0.12em, kicker)
   v(6pt)
-  text(27pt, weight: "bold", fill: navy, tracking: -0.02em, title)
+  // titre sur une ligne : corps réduit si besoin (27 pt au plus)
+  layout(size => context {
+    let t(s) = text(s, weight: "bold", fill: navy, tracking: -0.02em, title)
+    let w = measure(t(27pt)).width
+    t(if w > size.width { 27pt * (size.width / w) * 0.98 } else { 27pt })
+  })
   if translation != "" { v(-14pt); text(15pt, weight: "light", fill: gris, translation) }
   v(10pt)
   grid(columns: (1fr, auto), align: bottom,
-    [#text(7.5pt, fill: gris, tracking: 0.1em, "PARTICIPANT·E") \ #text(17pt, weight: "medium", participant)],
+    [#text(7.5pt, fill: gris, tracking: 0.1em, "PARTICIPANT·E") \ #text(17pt, weight: "medium", fill: encre, participant)],
     if code != none { text(8pt, fill: gris)[Code projet \ #text(fill: navy, weight: "bold", code)] })
   v(10pt)
   let cle((label, valeur)) = {
@@ -176,6 +183,7 @@
   set text(font: "Marianne", size: 9.5pt, fill: encre)
   set par(leading: 0.8em, spacing: 1.2em, justify: true)
   set list(marker: text(fill: navy, "•"), spacing: 0.9em)
+  show footnote.entry: set text(size: 6pt)
 
   set document(title: [#title], author: "MOOW By ENSFEA")
 

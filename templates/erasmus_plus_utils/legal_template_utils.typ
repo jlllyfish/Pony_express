@@ -5,27 +5,25 @@
 #let article_count = counter("article")
 #let mention_count = counter("mention")
 
-#let article(it) = block[
+#let article_navy = rgb("#16235C")
+
+#let article(it) = block(above: 26pt, below: 10pt, sticky: true)[
   #article_count.step()
   #mention_count.update(0)
-  #smallcaps(strong(
-    text(
-      13pt,
-      [Article #context article_count.display() : #it]
-    )
-  ))
-  #line(length: 100%)
+  #text(11.5pt, weight: "bold", fill: article_navy)[Article #context article_count.display() : #it]
+  #v(-4pt)
+  #line(length: 100%, stroke: 0.8pt + article_navy)
 ]
 
 #let mention(it) = block(breakable: false,[
   #mention_count.step()
   #text(
-    11pt,
+    9.5pt,
     {
       let width = 1em
       grid(
-        columns: (1em, 1fr),
-        gutter: 1em,
+        columns: (2.2em, 1fr),
+        gutter: 0.6em,
         [#context article_count.display().#context mention_count.display() ],
         [#it] 
       )
