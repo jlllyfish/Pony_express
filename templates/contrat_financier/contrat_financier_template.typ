@@ -161,7 +161,6 @@ Le participant accepte le soutien ou la prestation de services tel que spécifi�
 ]
 
 #mention[
-Je postule sur Envergo mais pense etre davantage pertinente sur le futur projet Nitrate.
 Le participant accepte le soutien ou la prestation de services tel que spécifié à l’article 3 et s’engage à réaliser l’activité de mobilité décrite à l’annexe. 
 ]
 
