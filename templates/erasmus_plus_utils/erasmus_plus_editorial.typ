@@ -137,8 +137,9 @@
         activate_translation: activate_translation)).intersperse(text(8pt, fill: gris, "ou")))
     }
   })
-  v(4pt)
-  grid(columns: (1fr, 1fr), column-gutter: 16pt, row-gutter: 20pt, ..blocs)
+  // insécable : un titre placé juste avant (sticky) suit les signatures sur la page suivante
+  block(breakable: false, above: 10pt,
+    grid(columns: (1fr, 1fr), column-gutter: 16pt, row-gutter: 20pt, ..blocs))
 }
 
 // ── Page de garde ────────────────────────────────────────────────────

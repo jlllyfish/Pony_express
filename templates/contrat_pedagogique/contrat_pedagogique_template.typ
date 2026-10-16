@@ -280,6 +280,8 @@
 = Disposition supplémentaires
 #chap[Sans objet]
 
+// titre, texte et signatures restent ensemble (saut de page si besoin)
+#block(breakable: false)[
 = Signatures
 
 #chap[
@@ -300,6 +302,7 @@
      ("Tuteur légal 2", tuteur(1, "nom"), tuteur(1, "prenom"))),
     ("Participant", participant_nom, signature_participant_prenom),
   ))
+]
 ]
 
 ]
