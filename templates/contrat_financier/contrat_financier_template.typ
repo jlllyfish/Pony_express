@@ -4,7 +4,7 @@
 
 #let contrat_financier(
   code_projet: missing_data,
-  secteur: "L’enseignement et la formation professionnels",
+  secteur: "Enseignement et formation professionnels",
   type_activite: missing_data,
   date_debut: missing_data,
   date_fin: missing_data,
@@ -74,7 +74,13 @@
   ),
   activate_translation: false,
 )
-  
+
+#form((
+    "Secteur": custom_data(secteur),
+    "Type d’activité": custom_data(type_activite),
+  ),
+  activate_translation: false,
+)
 
 = Préambule
 
@@ -84,7 +90,7 @@
 
   *d'une part*,
 
-  L’Organisme (”l’organisme”)
+  *L’Organisme (”l’organisme”)*
 
   Nom officiel complet de l’organisme d’envoi : #custom_data(organisme_envoi_nom)
 
@@ -105,7 +111,7 @@
 
   *et d'autre part*,
 
-  Le “participant”
+  *Le “participant”*
   
   Nom(s) et prénom(s) : #custom_data(participant_nom_complet)
   
@@ -166,7 +172,7 @@ Le contrat financier entre en vigueur à la date de signature de la dernière de
 ]
 
 #mention[
-Le contrat financier couvrira la période #footnote[Cette période comprend les composantes physique et virtuel#text(red, "date de résiliation ou est elle mentionnée ?")le de la mobilité, comme indiqué dans l’annexe, et les jours de voyage (voir l’annexe pour un calendrier détaillé).] allant du #custom_data(date_debut)  au #custom_data(date_fin) (date depart / date retour)
+Le contrat financier couvrira la période #footnote[Cette période comprend les composantes physique et virtuelle de la mobilité, comme indiqué dans l’annexe, et les jours de voyage (voir l’annexe pour un calendrier détaillé).] allant du #custom_data(date_debut)  au #custom_data(date_fin) (date depart / date retour)
 Dont #custom_data(duree_voyage) jours de voyage
 ]
 
@@ -262,7 +268,7 @@ Le soutien financier ne peut être utilisé pour couvrir les coûts d'activités
   La couverture d’assurance inclura au minimum une assurance maladie, une assurance responsabilité civile et une assurance accident#footnote[En cas de mobilité intracommunautaire, l’assurance maladie nationale du participant inclura une couverture de base pendant son séjour dans un autre pays de l’UE grâce à la carte européenne d’assurance maladie. Toutefois, cette couverture peut ne pas être suffisante pour toutes les situations, par exemple en cas de rapatriement ou d’intervention médicale spéciale ou en cas de mobilité internationale. Dans ce cas, une assurance maladie privée complémentaire peut être nécessaire. Les assurances responsabilité civile et accident couvrent les dommages causés par le participant ou au participant pendant son séjour à l’étranger. La réglementation de ces assurances varie selon les pays et les participants courent le risque de ne pas être couverts par les régimes standards, par exemple s’ils ne sont pas considérés comme des employés ou officiellement inscrits dans l’organisme d’accueil. En plus de ce qui est indiqué précédemment, il est recommandé de souscrire à une assurance contre la perte ou le vol de documents, de titres de voyages et de bagages. L’Agence nationale peut compléter l’article 7.2 s’il est justifié d’adapter les exigences par défaut au contexte national.]. 
 ]
 
-#mention[La partie responsable de la souscription de l’assurance est#footnote[En cas d’assurances distinctes, les parties responsables peuvent être différentes et seront énumérées ici en fonction de leurs responsabilités respectives.]
+#mention[La partie responsable de la souscription de l’assurance est le#footnote[En cas d’assurances distinctes, les parties responsables peuvent être différentes et seront énumérées ici en fonction de leurs responsabilités respectives.]
 
  : #custom_data(assurance_responsable)
   #form((
