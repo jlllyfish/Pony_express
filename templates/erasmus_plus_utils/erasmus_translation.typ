@@ -23,6 +23,7 @@
   "Date, lieu et signature": "Date, place and signature",
   "Début": "Start",
   "Destination": "Destination",
+  "Signature et cachet": "Signature and stamp",
   "Durée": "Length",
   "Fin": "End",
   "Responsable": "Manager",

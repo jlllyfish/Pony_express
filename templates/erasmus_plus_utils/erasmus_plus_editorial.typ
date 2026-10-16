@@ -102,8 +102,15 @@
   text(weight: "bold", upper(nom)) + if prenom not in (missing_data, "") [ #prenom ]
 }
 
+#let zone_signature(label, hauteur, activate_translation) = {
+  v(hauteur)
+  line(length: 100%, stroke: 0.5pt + filet)
+  v(-6pt)
+  text(7pt, fill: gris)[#label #if activate_translation and is_translatable(label) [· #en(translate(label))]]
+}
+
 #let signature(title, name, prenom: "", activate_translation: true) = block(
-  breakable: false, width: 100%, height: 2.3cm,
+  breakable: false, width: 100%,
   stroke: (left: 2pt + jaune), inset: (left: 10pt, y: 4pt), {
     set par(justify: false)
     set text(hyphenate: false)
@@ -112,11 +119,8 @@
     if t != none { h(4pt); text(7pt, en(t)) }
     linebreak()
     text(9pt, signature_name(name, prenom))
-    place(bottom + left, dy: -2pt, {
-      line(length: 100%, stroke: 0.5pt + filet)
-      v(-6pt)
-      text(7pt, fill: gris)[Date, lieu et signature #if activate_translation [· #en(translate("Date, lieu et signature"))]]
-    })
+    zone_signature("Date et lieu", 0.9cm, activate_translation)
+    zone_signature("Signature et cachet", 3.2cm, activate_translation)
   })
 
 // une cellule = ("Titre", "Nom", "Prénom") ; ou plusieurs signataires alternatifs, séparés par « ou » :
@@ -134,15 +138,14 @@
     }
   })
   v(4pt)
-  grid(columns: (1fr, 1fr), gutter: 12pt, ..blocs)
+  grid(columns: (1fr, 1fr), column-gutter: 16pt, row-gutter: 20pt, ..blocs)
 }
 
 // ── Page de garde ────────────────────────────────────────────────────
 // cles : ((intitulé, valeur), ...) — bandeau de chiffres clés (traductions par le dictionnaire)
 #let couverture(kicker: "ERASMUS+", title: "", translation: "", participant: none,
                 code: none, cles: (), activate_translation: true) = outdent({
-  box(fill: jaune, inset: (x: 6pt, y: 3pt),
-    text(7.5pt, weight: "bold", fill: navy, tracking: 0.1em, kicker))
+  text(8pt, weight: "bold", fill: navy, tracking: 0.12em, kicker)
   v(6pt)
   text(27pt, weight: "bold", fill: navy, tracking: -0.02em, title)
   if translation != "" { v(-14pt); text(15pt, weight: "light", fill: gris, translation) }
@@ -199,15 +202,15 @@
       v(4pt)
       text(12.5pt, weight: "bold", fill: navy, it.body)
       let t = tr(it.body, activate: activate_translation)
-      if t != none { h(6pt); text(9pt, en(t)) }
+      if t != none { linebreak(); text(9pt, en(t)) }
       v(-4pt)
       line(length: 100%, stroke: 1.2pt + navy)
     })))
 
-  show heading.where(level: 2): it => block(above: 12pt, below: 8pt, {
-    text(10pt, weight: "bold", fill: navy, counter(heading).display() + h(5pt) + it.body)
+  show heading.where(level: 2): it => block(above: 22pt, below: 10pt, {
+    text(11.5pt, weight: "bold", fill: navy, counter(heading).display() + h(6pt) + it.body)
     let t = tr(it.body, activate: activate_translation)
-    if t != none { h(5pt); text(8pt, en(t)) }
+    if t != none { h(6pt); text(9pt, en(t)) }
   })
 
   show heading.where(level: 3): it => block(above: 10pt, below: 2pt,
