@@ -268,9 +268,7 @@ Le soutien financier ne peut être utilisé pour couvrir les coûts d'activités
   La couverture d’assurance inclura au minimum une assurance maladie, une assurance responsabilité civile et une assurance accident#footnote[En cas de mobilité intracommunautaire, l’assurance maladie nationale du participant inclura une couverture de base pendant son séjour dans un autre pays de l’UE grâce à la carte européenne d’assurance maladie. Toutefois, cette couverture peut ne pas être suffisante pour toutes les situations, par exemple en cas de rapatriement ou d’intervention médicale spéciale ou en cas de mobilité internationale. Dans ce cas, une assurance maladie privée complémentaire peut être nécessaire. Les assurances responsabilité civile et accident couvrent les dommages causés par le participant ou au participant pendant son séjour à l’étranger. La réglementation de ces assurances varie selon les pays et les participants courent le risque de ne pas être couverts par les régimes standards, par exemple s’ils ne sont pas considérés comme des employés ou officiellement inscrits dans l’organisme d’accueil. En plus de ce qui est indiqué précédemment, il est recommandé de souscrire à une assurance contre la perte ou le vol de documents, de titres de voyages et de bagages. L’Agence nationale peut compléter l’article 7.2 s’il est justifié d’adapter les exigences par défaut au contexte national.]. 
 ]
 
-#mention[La partie responsable de la souscription de l’assurance est le#footnote[En cas d’assurances distinctes, les parties responsables peuvent être différentes et seront énumérées ici en fonction de leurs responsabilités respectives.]
-
- : #custom_data(assurance_responsable)
+#mention[La partie responsable de la souscription de l’assurance est le#footnote[En cas d’assurances distinctes, les parties responsables peuvent être différentes et seront énumérées ici en fonction de leurs responsabilités respectives.] : #custom_data(assurance_responsable)
   #form((
       "Compagnie d'assurance": custom_data(compagnie_assurance),
       "Numéro et police d'assurance": custom_data(numero_police_assurance),
