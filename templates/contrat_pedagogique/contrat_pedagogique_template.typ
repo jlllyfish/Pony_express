@@ -296,8 +296,8 @@
   } else { missing_data }
 
   #signatures((
-    ("Organisme d’envoi", signature_envoi_nom, signature_envoi_prenom),
-    ("Organisme d’accueil", signature_accueil_nom, signature_accueil_prenom),
+    ("Organisme d’envoi", signature_envoi_nom, signature_envoi_prenom, organisation_envoi_nom),
+    ("Organisme d’accueil", signature_accueil_nom, signature_accueil_prenom, organisation_accueil_nom),
     (("Tuteur légal 1", tuteur(0, "nom"), tuteur(0, "prenom")),
      ("Tuteur légal 2", tuteur(1, "nom"), tuteur(1, "prenom"))),
     ("Participant", participant_nom, signature_participant_prenom),

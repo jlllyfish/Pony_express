@@ -109,7 +109,7 @@
   text(7pt, fill: gris)[#label #if activate_translation and is_translatable(label) [· #en(translate(label))]]
 }
 
-#let signature(title, name, prenom: "", activate_translation: true) = block(
+#let signature(title, name, prenom: "", organisme: none, activate_translation: true) = block(
   breakable: false, width: 100%,
   stroke: (left: 2pt + jaune), inset: (left: 10pt, y: 4pt), {
     set par(justify: false)
@@ -118,12 +118,13 @@
     let t = tr(title, activate: activate_translation)
     if t != none { h(4pt); text(7pt, en(t)) }
     linebreak()
+    if organisme != none { text(9.5pt, weight: "medium", fill: navy, organisme); linebreak() }
     text(9pt, signature_name(name, prenom))
     zone_signature("Date et lieu", 0.9cm, activate_translation)
     zone_signature("Signature et cachet", 3.2cm, activate_translation)
   })
 
-// une cellule = ("Titre", "Nom", "Prénom") ; ou plusieurs signataires alternatifs, séparés par « ou » :
+// une cellule = ("Titre", "Nom", "Prénom"[, "Organisme"]) ; ou plusieurs signataires alternatifs, séparés par « ou » :
 //   (("Tuteur légal 1", ...), ("Tuteur légal 2", ...))
 //   ou un dictionnaire { "Titre": nom, ... }
 #let signatures(cellules, activate_translation: true) = {
@@ -131,7 +132,7 @@
   let blocs = items.map(cellule => {
     if type(cellule.at(0)) == str {
       signature(cellule.at(0), cellule.at(1), prenom: cellule.at(2, default: ""),
-        activate_translation: activate_translation)
+        organisme: cellule.at(3, default: none), activate_translation: activate_translation)
     } else {
       stack(spacing: 6pt, ..cellule.map(s => signature(s.at(0), s.at(1), prenom: s.at(2, default: ""),
         activate_translation: activate_translation)).intersperse(text(8pt, fill: gris, "ou")))
