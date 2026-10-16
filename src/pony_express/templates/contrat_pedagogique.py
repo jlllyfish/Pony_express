@@ -1,5 +1,6 @@
 import os
 from copy import deepcopy
+from datetime import datetime
 from enum import Enum
 
 from slugify import slugify
@@ -247,6 +248,7 @@ def apply_data_transformation(data: dict) -> dict:
     transformed = deepcopy(data)
     set_date(transformed, "date_debut")
     set_date(transformed, "date_fin")
+    set_duree(transformed, "duree", "date_debut", "date_fin")
     set_joined(transformed, "pays_ville", [value(data, "pays"), value(data, "ville")])
     # une puce par ligne saisie dans DN
     for key in ("evaluation_format", "evaluation_criteres"):
@@ -327,10 +329,25 @@ def value(row: dict, key: str) -> str:
 
 
 def set_date(data: dict, key: str) -> None:
-    """Date au format jj-mm-aa ; si absente ou illisible : [donnée manquante]."""
+    """Date au format jj.mm.aaaa ; si absente ou illisible : [donnée manquante]."""
     try:
-        data[key] = get_date_from_timestamp(data[key])
+        jour = datetime.strptime(get_date_from_timestamp(data[key]), "%d-%m-%y")
+        data[key] = jour.strftime("%d.%m.%Y")
     except (KeyError, TypeError, ValueError):
+        data.pop(key, None)
+
+
+def set_duree(data: dict, key: str, debut: str, fin: str) -> None:
+    """Durée en jours, bornes incluses (dates déjà passées par set_date) ; sinon [donnée manquante]."""
+    try:
+        jours = (datetime.strptime(data[fin], "%d.%m.%Y")
+                 - datetime.strptime(data[debut], "%d.%m.%Y")).days + 1
+    except (KeyError, TypeError, ValueError):
+        data.pop(key, None)
+        return
+    if jours > 0:
+        data[key] = f"{jours} jour{'s' if jours > 1 else ''}"
+    else:
         data.pop(key, None)
 
 

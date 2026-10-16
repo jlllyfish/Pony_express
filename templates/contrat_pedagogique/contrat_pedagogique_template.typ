@@ -1,4 +1,4 @@
-#import "../erasmus_plus_utils/erasmus_plus_template_utils.typ" : * 
+#import "../erasmus_plus_utils/erasmus_plus_editorial.typ" : * 
 
 // taille des paragraphes d'introduction (FR + traduction) sous les titres
 #let intro(body) = text(size: 8pt, body)
@@ -12,6 +12,7 @@
   format_mobilite: "Activité de mobilité physique",
   date_debut: missing_data,
   date_fin: missing_data,
+  duree: missing_data,
   pays_ville: missing_data,
   acquis_list: (missing_data,),
   activites: (missing_data,),
@@ -75,13 +76,26 @@
  ) = [
 
 #show: doc => erasmus_plus_layout(
-  header_note: [Code projet : #code_projet],
-  title:[CONTRAT PÉDAGOGIQUE ERASMUS+], 
-  translation: "ERASMUS+ learning agreement",
+  header_note: code_projet,
+  title: "Contrat pédagogique",
   doc
 )
 
-#text(size: 13pt, weight: "bold")[#participant_premier_prenom #participant_nom]
+// « ERASMUS+ · KA121 VET » d'après le code projet (2026-1-FR01-KA121-VET-000435983)
+#let parts = if type(code_projet) == str { code_projet.split("-") } else { () }
+#couverture(
+  kicker: if parts.len() >= 5 [ERASMUS+ #h(3pt)·#h(3pt) #parts.at(3) #parts.at(4)] else [ERASMUS+],
+  title: "Contrat pédagogique",
+  translation: "Learning agreement",
+  participant: [#participant_premier_prenom #text(weight: "bold", participant_nom)],
+  code: code_projet,
+  cles: (
+    ("Destination", pays_ville),
+    ("Début", date_debut),
+    ("Fin", date_fin),
+    ("Durée", duree),
+  ),
+)
 
 = Information sur la mobilité à des fins d’apprentissage
 #chap[
@@ -89,9 +103,6 @@
   #form((
     "Secteur": "Enseignement et formation professionnels",
     "Type d’activité":type_activite,
-    "Pays, Ville":pays_ville,
-    "Date de début":date_debut,
-    "Date de fin":date_fin, 
   ))
 
 ]
@@ -110,20 +121,13 @@
     )
   )
   
-#let index = 1
-#for guardian in tuteurs_legaux {
-  
-  let displayed_index = if tuteurs_legaux.len() == 1 {""} else {index} 
-  if tuteurs_legaux.len() == 1 [=== Tuteur légal] else [=== Tuteur légal #index]
-  form((
-      "Nom":guardian.nom,
-      "Prénom" :guardian.prenom,
-      "Adresse mail":guardian.email,
-      "Téléphone":guardian.telephone
-    ))
-  index = index + 1
-
-}
+#forms(title_key: "Titre", tuteurs_legaux.enumerate().map(((i, guardian)) => (
+  "Titre": if tuteurs_legaux.len() == 1 { "Tuteur légal" } else { "Tuteur légal " + str(i + 1) },
+  "Nom": guardian.nom,
+  "Prénom": guardian.prenom,
+  "Adresse mail": guardian.email,
+  "Téléphone": guardian.telephone,
+)))
 ]
 
 == Organisme d’envoi
@@ -242,7 +246,7 @@
 
   // intertitre « Accompagnateur 1, 2… » ; la fonction passe dans le tableau
   #forms(title_key: "Titre", accompagnants.enumerate().map(((i, personne)) => (
-    "Titre": if accompagnants.len() == 1 [Accompagnateur] else [Accompagnateur #(i + 1)],
+    "Titre": if accompagnants.len() == 1 { "Accompagnateur" } else { "Accompagnateur " + str(i + 1) },
     "Nom": personne.nom,
     "Prénom":personne.prenom,
     "Adresse mail":personne.email,
