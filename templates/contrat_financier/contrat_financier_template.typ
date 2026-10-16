@@ -161,7 +161,7 @@ Le participant accepte le soutien ou la prestation de services tel que spécifi�
 ]
 
 #mention[
-Le participant accepte le soutien ou la prestation de services tel que spécifié à l’article 3 et s’engage à réaliser l’activité de mobilité décrite à l’annexe. 
+Tout avenant au présent contrat financier sera demandé et accepté par les deux parties de manière formelle par courrier postal ou par mail. Un avenant entre en vigueur le jour de la signature (ou accusé de réception) du destinataire. L’avenant prend effet à la date d’entrée en vigueur ou à toute autre date spécifiée dans l’avenant.
 ]
 
 #article[Entrée en vigueur du contrat et durée de la mobilité]
