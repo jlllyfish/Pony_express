@@ -172,8 +172,8 @@
 #let erasmus_plus_layout(title: "", translation: "", activate_translation: true, header_note: none,
                          show_title: true, doc) = {
   set text(font: "Marianne", size: 9.5pt, fill: encre)
-  set par(leading: 0.55em, justify: true)
-  set list(marker: text(fill: navy, "•"))
+  set par(leading: 0.8em, spacing: 1.2em, justify: true)
+  set list(marker: text(fill: navy, "•"), spacing: 0.9em)
 
   set document(title: [#title], author: "MOOW By ENSFEA")
 
@@ -195,7 +195,7 @@
   set heading(numbering: "1.1")
 
   show heading: set par(justify: false)
-  show heading.where(level: 1): it => block(above: 16pt, below: 6pt, outdent(grid(
+  show heading.where(level: 1): it => block(above: 24pt, below: 10pt, outdent(grid(
     columns: (num_col, 1fr),
     text(24pt, weight: "light", fill: navy, counter(heading).display()),
     {
@@ -207,7 +207,7 @@
       line(length: 100%, stroke: 1.2pt + navy)
     })))
 
-  show heading.where(level: 2): it => block(above: 22pt, below: 10pt, {
+  show heading.where(level: 2): it => block(above: 32pt, below: 12pt, {
     text(11.5pt, weight: "bold", fill: navy, counter(heading).display() + h(6pt) + it.body)
     let t = tr(it.body, activate: activate_translation)
     if t != none { h(6pt); text(9pt, en(t)) }
@@ -217,7 +217,11 @@
     role_title(it.body, activate_translation: activate_translation))
 
   // un titre ne reste jamais seul en bas de page (règle placée après les autres : appliquée en premier)
-  show heading: it => block(sticky: true, it)
+  // espacement porté par ce bloc extérieur (celui des blocs internes ne s'applique pas)
+  show heading: it => block(sticky: true,
+    above: if it.level == 1 { 28pt } else if it.level == 2 { 30pt } else { 14pt },
+    below: if it.level <= 2 { 12pt } else { 4pt },
+    it)
 
   if show_title and title != "" {
     outdent(block(below: 18pt, {
