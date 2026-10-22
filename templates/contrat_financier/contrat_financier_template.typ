@@ -123,7 +123,9 @@
   
   E-mail : #custom_data(participant_email)
 
-  Compte bancaire sur lequel le soutien financier sera versé #footnote[Option pour les participants bénéficiant d'un soutien financier Erasmus+, à l'exception de ceux pour lesquels l'article 3.4 Option 2 s'applique.] : les données du compte bancaire sont annexées en pièce-jointe.
+  // phrase et coordonnées bancaires sur la même page
+  #block(breakable: false)[
+  *Compte bancaire sur lequel le soutien financier sera versé*#footnote[Option pour les participants bénéficiant d'un soutien financier Erasmus+, à l'exception de ceux pour lesquels l'article 3.4 Option 2 s'applique.] : _les données du compte bancaire sont annexées en pièce-jointe._
 
   #form((
       "Nom de la banque": custom_data(banque_nom),
@@ -133,6 +135,7 @@
     ),
     activate_translation: false,
   )
+  ]
 
   Les parties mentionnées ci-dessus ont accepté de conclure ce contrat.
 
