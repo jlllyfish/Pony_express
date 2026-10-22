@@ -125,7 +125,8 @@
 
   // phrase et coordonnées bancaires sur la même page
   #block(breakable: false)[
-  *Compte bancaire sur lequel le soutien financier sera versé*#footnote[Option pour les participants bénéficiant d'un soutien financier Erasmus+, à l'exception de ceux pour lesquels l'article 3.4 Option 2 s'applique.] : _les données du compte bancaire sont annexées en pièce-jointe._
+  *Compte bancaire sur lequel le soutien financier sera versé*#footnote[Option pour les participants bénéficiant d'un soutien financier Erasmus+, à l'exception de ceux pour lesquels l'article 3.4 Option 2 s'applique.] : \
+  #text(size: 7.5pt)[_les données du compte bancaire sont annexées en pièce-jointe._]
 
   #form((
       "Nom de la banque": custom_data(banque_nom),
