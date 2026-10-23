@@ -1,7 +1,7 @@
 #import "../erasmus_plus_utils/erasmus_plus_editorial.typ" : * 
 
 // taille des paragraphes d'introduction (FR + traduction) sous les titres
-#let intro(body) = text(size: 8pt, body)
+#let intro(body) = { set par(spacing: 0.55em); text(size: 8pt, body) }
 
 // texte sur plusieurs lignes (liste de lignes) : une puce par ligne, sans saut de ligne
 #let puces(lignes) = if type(lignes) == array { list(tight: true, ..lignes) } else { lignes }

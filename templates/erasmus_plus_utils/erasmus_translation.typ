@@ -6,7 +6,7 @@
   // Identity informations
   "Nom": "Name",
   "Nom complet": "Full name",
-  "Prénom": "Firstname",
+  "Prénom": "First name",
   "Adresse": "Address",
   "Adresse mail": "Email",
   "Téléphone": "Phone number",
@@ -54,7 +54,7 @@
   "Modalités de suivi et de tutorat": "Mentoring and monitoring arrangements",
   "Moins de 250 employés": "Less than 250 employees",
   "Niveau dans le Cadre Européen des Certifications": "Level in the European Qualifications Framework",
-  "Nom de l'organisme": "Organism name",
+  "Nom de l'organisme": "Organisation name",
   "Objectifs du contrat pédagogique": "Purpose of the learning agreement",
   "Organisme d’accueil": "Receiving organisation",
   "Organisme d’envoi": "Sending organisation",

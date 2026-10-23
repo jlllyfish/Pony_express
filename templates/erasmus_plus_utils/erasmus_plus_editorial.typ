@@ -88,7 +88,7 @@
     }
     form_table(rest, activate_translation: activate_translation, wide_title: wide_title)
   })
-  v(6pt)
+  v(22pt)
   block(width: 100%, above: 0pt, below: 12pt,
     grid(columns: if items.len() > 1 { (1fr, 1fr) } else { (1fr,) },
       column-gutter: 16pt, row-gutter: 14pt,
@@ -121,8 +121,8 @@
     if organisme != none { text(9.5pt, weight: "medium", fill: navy, organisme); linebreak() }
     text(9pt, signature_name(name, prenom))
     if fonction != none { linebreak(); text(8.5pt, fill: gris, fonction) }
-    zone_signature("Date et lieu", 0.9cm, activate_translation)
-    zone_signature("Signature et cachet", 3.2cm, activate_translation)
+    zone_signature("Date et lieu", 0.8cm, activate_translation)
+    zone_signature("Signature et cachet", 2.5cm, activate_translation)
   })
 
 // une cellule = ("Titre", "Nom", "Prénom"[, "Organisme"[, "Fonction"]]) ; ou plusieurs signataires alternatifs, séparés par « ou » :
@@ -157,7 +157,7 @@
     let w = measure(t(27pt)).width
     t(if w > size.width { 27pt * (size.width / w) * 0.98 } else { 27pt })
   })
-  if translation != "" { v(-14pt); text(15pt, weight: "light", fill: gris, translation) }
+  if translation != "" { v(-6pt); text(15pt, weight: "light", fill: gris, translation) }
   v(10pt)
   grid(columns: (1fr, auto), align: bottom,
     [#text(7.5pt, fill: gris, tracking: 0.1em, "PARTICIPANT·E") \ #text(17pt, weight: "medium", fill: encre, participant)],
@@ -169,7 +169,7 @@
     if t != none { h(3pt); text(6.5pt, en(t)) }
     linebreak()
     v(-2pt)
-    text(15pt, weight: "bold", fill: navy, valeur)
+    text(12pt, weight: "bold", fill: navy, valeur)
   }
   set par(justify: false)
   block(width: 100%, stroke: (top: 2pt + navy, bottom: 0.5pt + filet), inset: (y: 10pt), below: 14pt,
@@ -229,8 +229,8 @@
   // un titre ne reste jamais seul en bas de page (règle placée après les autres : appliquée en premier)
   // espacement porté par ce bloc extérieur (celui des blocs internes ne s'applique pas)
   show heading: it => block(sticky: true,
-    above: if it.level == 1 { 28pt } else if it.level == 2 { 30pt } else { 14pt },
-    below: if it.level <= 2 { 12pt } else { 4pt },
+    above: if it.level == 1 { 28pt } else if it.level == 2 { 30pt } else { 20pt },
+    below: if it.level <= 2 { 12pt } else { 14pt },
     it)
 
   if show_title and title != "" {
