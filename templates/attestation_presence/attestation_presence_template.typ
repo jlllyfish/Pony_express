@@ -1,12 +1,14 @@
 #import "../erasmus_plus_utils/erasmus_plus_editorial.typ" : *
 
 // taille des paragraphes d'introduction (FR + traduction) sous les titres
-#let intro(body) = { set par(spacing: 0.55em); text(size: 8pt, body) }
+#let intro(body) = { set par(spacing: 0.5em, leading: 0.65em); text(size: 8pt, body) }
 
 #let attestation_presence(
   code_projet: missing_data,
   date_debut: missing_data,
   date_fin: missing_data,
+  date_debut_en: missing_data,  // format américain mm/dd/yyyy
+  date_fin_en: missing_data,
   duree: missing_data,
   pays_ville: missing_data,
   participant_nom: missing_data,
@@ -44,6 +46,7 @@
     ("Fin", date_fin),
     ("Durée", duree),
   ),
+  compact: true,
 )
 
 = Attestation de participation
@@ -66,7 +69,7 @@
   Participant : *#participant_prenom #participant_nom* #h(4pt) #text(8pt, en("Participant"))
 
   L’activité de mobilité s’est déroulée du *#date_debut* au *#date_fin*. \
-  #text(8pt, en[The mobility activity took place from #date_debut to #date_fin.])
+  #text(8pt, en[The mobility activity took place from #date_debut_en to #date_fin_en.])
 ]
 
 #block(breakable: false)[

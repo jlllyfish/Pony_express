@@ -74,7 +74,8 @@ REFERENCES = {
 
 # Calculés dans apply_data_transformation :
 #   pays_ville, duree, participant_premier_prenom,
-#   date_signature_accueil (= date de fin de stage, pré-remplie dans le bloc de l'organisme d'accueil)
+#   date_signature_accueil (= date de fin de stage, pré-remplie dans le bloc de l'organisme d'accueil),
+#   date_debut_en, date_fin_en (format américain pour la traduction anglaise)
 
 STUDENT_DATA = build_enum("STUDENT_DATA", PRINCIPALE, JOINTES, module=__name__)
 EXTRA_TABLES = build_reference_tables(REFERENCES)
@@ -100,6 +101,11 @@ def apply_data_transformation(data: dict) -> dict:
     # la personne responsable de l'organisme d'accueil signe à la date de fin de stage
     if "date_fin" in transformed:
         transformed["date_signature_accueil"] = transformed["date_fin"]
+    # traduction anglaise : dates au format américain (mm/dd/yyyy)
+    for key in ("date_debut", "date_fin"):
+        if key in transformed:
+            jour, mois, annee = transformed[key].split(".")
+            transformed[key + "_en"] = f"{mois}/{jour}/{annee}"
     # colonne vide ou absente de Grist : [donnée manquante] plutôt qu'une case blanche
     for param in list(transformed):
         val = transformed[param]

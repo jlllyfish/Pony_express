@@ -160,21 +160,23 @@
 // ── Page de garde ────────────────────────────────────────────────────
 // cles : ((intitulé, valeur), ...) — bandeau de chiffres clés (traductions par le dictionnaire)
 #let couverture(kicker: "ERASMUS+", title: "", translation: "", participant: none,
-                code: none, cles: (), activate_translation: true) = outdent({
+                code: none, cles: (), activate_translation: true, compact: false) = outdent({
+  // compact : page de garde resserrée (document d'une page)
+  let (t_size, sous, nom, gap) = if compact { (20pt, 12pt, 13pt, 6pt) } else { (27pt, 15pt, 17pt, 10pt) }
   text(8pt, weight: "bold", fill: navy, tracking: 0.12em, kicker)
   v(6pt)
-  // titre sur une ligne : corps réduit si besoin (27 pt au plus)
+  // titre sur une ligne : corps réduit si besoin
   layout(size => context {
     let t(s) = text(s, weight: "bold", fill: navy, tracking: -0.02em, title)
-    let w = measure(t(27pt)).width
-    t(if w > size.width { 27pt * (size.width / w) * 0.98 } else { 27pt })
+    let w = measure(t(t_size)).width
+    t(if w > size.width { t_size * (size.width / w) * 0.98 } else { t_size })
   })
-  if translation != "" { v(-6pt); text(15pt, weight: "light", fill: gris, translation) }
-  v(10pt)
+  if translation != "" { v(-6pt); text(sous, weight: "light", fill: gris, translation) }
+  v(gap)
   grid(columns: (1fr, auto), align: bottom,
-    [#text(7.5pt, fill: gris, tracking: 0.1em, "PARTICIPANT·E") \ #text(17pt, weight: "medium", fill: encre, participant)],
+    [#text(7.5pt, fill: gris, tracking: 0.1em, "PARTICIPANT·E") \ #text(nom, weight: "medium", fill: encre, participant)],
     if code != none { text(8pt, fill: gris)[Code projet \ #text(fill: navy, weight: "bold", code)] })
-  v(10pt)
+  v(gap)
   let cle((label, valeur)) = {
     text(7pt, fill: gris, tracking: 0.08em, upper(label))
     let t = tr(label, activate: activate_translation)
@@ -184,7 +186,7 @@
     text(12pt, weight: "bold", fill: navy, valeur)
   }
   set par(justify: false)
-  block(width: 100%, stroke: (top: 2pt + navy, bottom: 0.5pt + filet), inset: (y: 10pt), below: 14pt,
+  block(width: 100%, stroke: (top: 2pt + navy, bottom: 0.5pt + filet), inset: (y: gap), below: gap + 4pt,
     grid(columns: (1.4fr,) + (1fr,) * calc.max(cles.len() - 1, 0), column-gutter: 12pt, ..cles.map(cle)))
 })
 
