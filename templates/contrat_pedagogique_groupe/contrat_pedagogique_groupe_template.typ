@@ -11,6 +11,17 @@
 // texte sur plusieurs lignes : un paragraphe par ligne
 #let paragraphes(lignes) = if type(lignes) == array { lignes.map(l => par(l)).join() } else { lignes }
 
+// rubrique d'une activité : petit intitulé collé au texte qui suit
+#let rubrique(label, contenu) = block(above: 11pt, below: 0pt, {
+  block(below: 6pt, sticky: true, {
+    text(6.5pt, weight: "bold", fill: navy, tracking: 0.08em, upper(label))
+    h(4pt)
+    text(6.5pt, en(translate(label)))
+  })
+  set list(spacing: 0.6em)
+  block(above: 0pt, puces(contenu))
+})
+
 // fiche personne : nom, intitulé du poste, mail, téléphone
 #let personnes(liste, prefixe) = forms(title_key: "Titre",
   liste.enumerate().map(((i, p)) => (
@@ -117,17 +128,12 @@
   #for (i, a) in activites.enumerate() [
     #if i > 0 { v(12pt) }
     #block(breakable: false)[
-      #block(above: 14pt, below: 8pt)[
-        #text(10pt, weight: "bold", fill: navy)[Activité #(i + 1)#if "titre" in a [ : #a.titre]]
-        #h(5pt) #text(8.5pt, en[Activity #(i + 1)])
+      #block(above: 14pt, below: 2pt)[
+        #text(12pt, weight: "bold", fill: navy)[Activité #(i + 1)#if "titre" in a [ : #a.titre]]
+        #h(5pt) #text(9pt, en[Activity #(i + 1)])
       ]
-      #role_title("Méthodes et tâches")
-      #v(2pt)
-      #puces(a.at("methodes", default: missing_data))
-      #v(6pt)
-      #role_title("Acquis d’apprentissage")
-      #v(2pt)
-      #puces(a.at("acquis", default: missing_data))
+      #rubrique("Méthodes et tâches", a.at("methodes", default: missing_data))
+      #rubrique("Acquis d’apprentissage", a.at("acquis", default: missing_data))
     ]
   ]
 ]

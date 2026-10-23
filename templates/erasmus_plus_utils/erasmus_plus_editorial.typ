@@ -102,7 +102,8 @@
   set par(justify: false)
   table(
     columns: if columns == auto { (1fr,) * entetes.len() } else { columns },
-    inset: (x: 6pt, y: 6pt),
+    // plus d'air entre le filet de l'en-tête et la première ligne
+    inset: (x, y) => (x: 6pt, top: if y == 1 { 11pt } else { 6pt }, bottom: 6pt),
     stroke: (x, y) => (bottom: if y == 0 { 1.2pt + navy } else { 0.5pt + filet }),
     table.header(..entetes.map(h => {
       text(7.5pt, weight: "bold", fill: navy, tracking: 0.06em, upper(h))
