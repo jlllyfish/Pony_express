@@ -76,7 +76,8 @@
 
 // plusieurs fiches (personnes) : deux colonnes dès qu'il y en a plus d'une
 // title_key : clé affichée en intertitre au-dessus de la fiche (et retirée du tableau)
-#let forms(items, activate_translation: true, wide_title: false, title_key: none) = {
+// espace_avant : marge au-dessus des fiches (réduite quand elles suivent directement un sous-titre)
+#let forms(items, activate_translation: true, wide_title: false, title_key: none, espace_avant: 22pt) = {
   let fiche(fields) = block(breakable: false, width: 100%, {
     if title_key != none and title_key in fields and fields.at(title_key) != "" {
       role_title(fields.at(title_key), activate_translation: activate_translation)
@@ -88,7 +89,7 @@
     }
     form_table(rest, activate_translation: activate_translation, wide_title: wide_title)
   })
-  v(22pt)
+  v(espace_avant)
   block(width: 100%, above: 0pt, below: 12pt,
     grid(columns: if items.len() > 1 { (1fr, 1fr) } else { (1fr,) },
       column-gutter: 16pt, row-gutter: 14pt,

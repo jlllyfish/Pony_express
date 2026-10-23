@@ -23,7 +23,7 @@
 })
 
 // fiche personne : nom, intitulé du poste, mail, téléphone
-#let personnes(liste, prefixe) = forms(title_key: "Titre",
+#let personnes(liste, prefixe) = forms(title_key: "Titre", espace_avant: 4pt,
   liste.enumerate().map(((i, p)) => (
     "Titre": if liste.len() == 1 { prefixe } else { prefixe + " " + str(i + 1) },
     "Nom": [#text(weight: "bold", upper(p.at("nom", default: missing_data))) #p.at("prenom", default: "")],
