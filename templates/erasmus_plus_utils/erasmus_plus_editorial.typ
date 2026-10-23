@@ -102,14 +102,18 @@
   text(weight: "bold", upper(nom)) + if prenom not in (missing_data, "") [ #prenom ]
 }
 
-#let zone_signature(label, hauteur, activate_translation) = {
-  v(hauteur)
+// valeur : texte pré-rempli au-dessus de la ligne (ex : date de fin de stage)
+#let zone_signature(label, hauteur, activate_translation, valeur: none) = {
+  // hauteur fixe : la ligne reste au même niveau, valeur pré-remplie ou non
+  block(width: 100%, height: hauteur, above: 0pt, below: 0pt,
+    align(bottom, if valeur != none { pad(bottom: 3pt, text(9pt, weight: "bold", valeur)) }))
   line(length: 100%, stroke: 0.5pt + filet)
   v(-6pt)
   text(7pt, fill: gris)[#label #if activate_translation and is_translatable(label) [· #en(translate(label))]]
 }
 
-#let signature(title, name, prenom: "", organisme: none, fonction: none, activate_translation: true) = block(
+#let signature(title, name, prenom: "", organisme: none, fonction: none, adresse: none,
+                date: none, date_label: "Date et lieu", activate_translation: true) = block(
   breakable: false, width: 100%,
   stroke: (left: 2pt + jaune), inset: (left: 10pt, y: 4pt), {
     set par(justify: false)
@@ -119,19 +123,27 @@
     if t != none { h(4pt); text(7pt, en(t)) }
     linebreak()
     if organisme != none { text(9.5pt, weight: "medium", fill: navy, organisme); linebreak() }
+    if adresse != none { text(8pt, fill: gris, adresse); linebreak() }
     text(9pt, signature_name(name, prenom))
     if fonction != none { linebreak(); text(8.5pt, fill: gris, fonction) }
-    zone_signature("Date et lieu", 0.8cm, activate_translation)
+    zone_signature(date_label, 0.8cm, activate_translation, valeur: date)
     zone_signature("Signature et cachet", 2.5cm, activate_translation)
   })
 
 // une cellule = ("Titre", "Nom", "Prénom"[, "Organisme"[, "Fonction"]]) ; ou plusieurs signataires alternatifs, séparés par « ou » :
 //   (("Tuteur légal 1", ...), ("Tuteur légal 2", ...))
+//   ou une fiche (titre: ..., nom: ..., prenom:, organisme:, fonction:, adresse:, date:, date_label:)
 //   ou un dictionnaire { "Titre": nom, ... }
 #let signatures(cellules, activate_translation: true) = {
   let items = if type(cellules) == dictionary { cellules.pairs() } else { cellules }
   let blocs = items.map(cellule => {
-    if type(cellule.at(0)) == str {
+    if type(cellule) == dictionary {
+      let f = cellule
+      signature(f.titre, f.at("nom", default: missing_data), prenom: f.at("prenom", default: ""),
+        organisme: f.at("organisme", default: none), fonction: f.at("fonction", default: none),
+        adresse: f.at("adresse", default: none), date: f.at("date", default: none),
+        date_label: f.at("date_label", default: "Date et lieu"), activate_translation: activate_translation)
+    } else if type(cellule.at(0)) == str {
       signature(cellule.at(0), cellule.at(1), prenom: cellule.at(2, default: ""),
         organisme: cellule.at(3, default: none), fonction: cellule.at(4, default: none),
         activate_translation: activate_translation)
@@ -179,7 +191,7 @@
 // ── Mise en page ─────────────────────────────────────────────────────
 // show_title : titre en tête de la première page (false si le template appelle #couverture)
 #let erasmus_plus_layout(title: "", translation: "", activate_translation: true, header_note: none,
-                         show_title: true, doc) = {
+                         show_title: true, footer_extra: none, doc) = {
   set text(font: "Marianne", size: 9.5pt, fill: encre)
   set par(leading: 0.8em, spacing: 1.2em, justify: true)
   set list(marker: text(fill: navy, "•"), spacing: 0.9em)
@@ -198,8 +210,11 @@
       v(-2pt)
       line(length: 100%, stroke: 0.5pt + filet)
     }),
-    footer: outdent(text(7.5pt, fill: gris)[
-      #header_note #h(1fr) #title · #context counter(page).display("1/1", both: true)]),
+    // footer_extra : mention légale en petit au-dessus du pied de page (ex : Europass)
+    footer: outdent({
+      if footer_extra != none { block(below: 4pt, text(6pt, fill: gris, footer_extra)) }
+      text(7.5pt, fill: gris)[#header_note #h(1fr) #title · #context counter(page).display("1/1", both: true)]
+    }),
   )
 
   set heading(numbering: "1.1")
