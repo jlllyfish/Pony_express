@@ -25,6 +25,7 @@ DEMARCHE = "156967"
 GRIST_TABLE = os.environ.get("GRIST_TABLE_GROUPE", f"Demarche_{DEMARCHE}_champs")  # table principale
 TABLE_ANNOTATIONS = f"Demarche_{DEMARCHE}_annotations"
 TABLE_ACTIVITES = f"Demarche_{DEMARCHE}_repetable_description_des_activites_et_des_acquis_d_apprentissage"
+TABLE_ACCOMPAGNATEURS = f"Demarche_{DEMARCHE}_repetable_autre_s_accompagnateur_s"
 TABLE_ETABLISSEMENTS = "Etablissements"
 BLOCK_KEY = "dossier_number"
 BLOCK_ORDER = "block_row_index"
@@ -87,6 +88,11 @@ JOINTES = {
 # Table de blocs répétables : une ligne par activité
 BLOCS = {
     "activites": (TABLE_ACTIVITES, {"titre": "titre_de_l_activite", "activite": "activite", "acquis": "acquis"}),
+    # autres accompagnateurs (après le référent)
+    "accompagnants": (TABLE_ACCOMPAGNATEURS, {
+        "nom": "nom", "prenom": "prenom", "fonction": "intitule_du_poste",
+        "email": "adresse_electronique", "telephone": "numero_de_telephone",
+    }),
 }
 
 # Tables de référence : UNE ligne choisie pour le dossier
@@ -166,7 +172,12 @@ def apply_data_transformation(data: dict) -> dict:
     set_or_drop(transformed, "participants", [(nom, envoi) for nom in lignes(value(data, "liste_participants"))])
     set_or_drop(transformed, "calendrier", [etape(l) for l in lignes(value(data, "calendrier_texte"))])
 
-    set_or_drop(transformed, "accompagnants", personnes(data, "ref"))
+    # accompagnateur référent, puis les autres (répétable)
+    _, colonnes = BLOCS["accompagnants"]
+    autres = [{champ: value(b, col) for champ, col in colonnes.items()}
+              for b in get_blocks(TABLE_ACCOMPAGNATEURS, data.get("numero_dossier"))]
+    autres = [{k: v for k, v in p.items() if v} for p in autres if value(p, "nom")]
+    set_or_drop(transformed, "accompagnants", personnes(data, "ref") + autres)
     set_or_drop(transformed, "contacts_envoi", personnes(data, "contact_envoi"), vide=[])
     set_or_drop(transformed, "contacts_accueil", personnes(data, "accueil_resp"))
 
