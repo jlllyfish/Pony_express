@@ -76,7 +76,7 @@ REFERENCES = {
 #   pays_ville, duree, participant_premier_prenom,
 #   date_signature_accueil (= date de fin de stage, pré-remplie dans le bloc de l'organisme d'accueil)
 
-STUDENT_DATA = build_enum("STUDENT_DATA", PRINCIPALE, JOINTES)
+STUDENT_DATA = build_enum("STUDENT_DATA", PRINCIPALE, JOINTES, module=__name__)
 EXTRA_TABLES = build_reference_tables(REFERENCES)
 
 

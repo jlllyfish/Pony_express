@@ -110,15 +110,16 @@ CONSTANTES = {
 # =====================================================================
 
 
-def build_enum(name: str, principale: dict, jointes: dict) -> Enum:
-    """Enum attendue par PonyExpress : nom = paramètre Typst, valeur = colonne ou "Table.colonne"."""
+def build_enum(name: str, principale: dict, jointes: dict, module: str = __name__) -> Enum:
+    """Enum attendue par PonyExpress : nom = paramètre Typst, valeur = colonne ou "Table.colonne".
+    `module` : module qui déclare l'Enum (check_mapping.py la cherche dans le module de la config)."""
     members = dict(principale)
     for table, columns in jointes.items():
         for param, column in columns.items():
             if param in members:
                 raise ValueError(f"Paramètre déclaré deux fois : {param}")
             members[param] = f"{table}.{column}"
-    return Enum(name, members, module=__name__)
+    return Enum(name, members, module=module)
 
 
 def build_reference_tables(references: dict) -> dict:
