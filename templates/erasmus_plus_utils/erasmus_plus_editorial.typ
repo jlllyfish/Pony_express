@@ -95,6 +95,24 @@
       ..items.map(fiche)))
 }
 
+// ── Tableau ──────────────────────────────────────────────────────────
+// entetes : intitulés français (traduits par le dictionnaire) ; lignes : liste de lignes (listes de cellules)
+// l'en-tête se répète si le tableau continue sur la page suivante
+#let tableau(entetes, lignes, columns: auto, activate_translation: true) = {
+  set par(justify: false)
+  table(
+    columns: if columns == auto { (1fr,) * entetes.len() } else { columns },
+    inset: (x: 6pt, y: 6pt),
+    stroke: (x, y) => (bottom: if y == 0 { 1.2pt + navy } else { 0.5pt + filet }),
+    table.header(..entetes.map(h => {
+      text(7.5pt, weight: "bold", fill: navy, tracking: 0.06em, upper(h))
+      let t = tr(h, activate: activate_translation)
+      if t != none { linebreak(); text(7pt, en(t)) }
+    })),
+    ..lignes.flatten(),
+  )
+}
+
 // ── Signatures ───────────────────────────────────────────────────────
 #let signature_name(nom, prenom) = if nom in (missing_data, "") {
   missing_data
@@ -160,7 +178,8 @@
 // ── Page de garde ────────────────────────────────────────────────────
 // cles : ((intitulé, valeur), ...) — bandeau de chiffres clés (traductions par le dictionnaire)
 #let couverture(kicker: "ERASMUS+", title: "", translation: "", participant: none,
-                code: none, cles: (), activate_translation: true, compact: false) = outdent({
+                code: none, cles: (), activate_translation: true, compact: false,
+                participant_label: "PARTICIPANT·E", code_label: "Code projet") = outdent({
   // compact : page de garde resserrée (document d'une page)
   let (t_size, sous, nom, gap) = if compact { (20pt, 12pt, 13pt, 6pt) } else { (27pt, 15pt, 17pt, 10pt) }
   text(8pt, weight: "bold", fill: navy, tracking: 0.12em, kicker)
@@ -174,8 +193,8 @@
   if translation != "" { v(-6pt); text(sous, weight: "light", fill: gris, translation) }
   v(gap)
   grid(columns: (1fr, auto), align: bottom,
-    [#text(7.5pt, fill: gris, tracking: 0.1em, "PARTICIPANT·E") \ #text(nom, weight: "medium", fill: encre, participant)],
-    if code != none { text(8pt, fill: gris)[Code projet \ #text(fill: navy, weight: "bold", code)] })
+    [#text(7.5pt, fill: gris, tracking: 0.1em, participant_label) \ #text(nom, weight: "medium", fill: encre, participant)],
+    if code != none { text(8pt, fill: gris)[#code_label \ #text(fill: navy, weight: "bold", code)] })
   v(gap)
   let cle((label, valeur)) = {
     text(7pt, fill: gris, tracking: 0.08em, upper(label))
