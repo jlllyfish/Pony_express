@@ -45,6 +45,8 @@ PRINCIPALE = {
     "participant_email": "mail_participant",
     "tuteur_1_nom": "nom_parent_tuteur_legal_1",
     "tuteur_1_prenom": "prenom_parent_tuteur_legal_1",
+    "tuteur_2_nom": "nom_parent_tuteur_legal_2",
+    "tuteur_2_prenom": "prenom_parent_tuteur_legal_2",
     "duree_voyage": "nombre_de_jours_de_voyage",
     "frais_sejour": "montant_frais_de_sejour",
     "frais_voyage": "montant_frais_de_voyage",
@@ -91,6 +93,8 @@ REFERENCES = {
 # Valeurs identiques pour tous les dossiers
 CONSTANTES = {
     "organisme_envoi_representant_fonction": "Directeur·rice",
+    "limite_prolongation": "89",   # article 3.3 (jours)
+    "accompte_pourcentage": "80",  # article 5.1 (%)
 }
 
 # Calculés dans apply_data_transformation :
@@ -98,7 +102,7 @@ CONSTANTES = {
 #   duree_jours_bourse (= jours d'activité + jours de voyage), valeur_bourse / montant_global
 #   (= montant_bourse), organisme_envoi_representant_nom_complet, option_prise_en_charge normalisée
 # Pas encore dans Grist (-> « [donnée manquante] ») :
-#   limite_prolongation, accompte_pourcentage, inclut_dans_contribution
+#   inclut_dans_contribution
 
 
 # =====================================================================

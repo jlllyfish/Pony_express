@@ -15,6 +15,8 @@
   duree: missing_data,
   tuteur_1_nom: missing_data,
   tuteur_1_prenom: "",
+  tuteur_2_nom: missing_data,
+  tuteur_2_prenom: "",
   envoi_direction_nom: missing_data,
   envoi_direction_prenom: "",
   assurance_responsable: missing_data,
@@ -175,8 +177,7 @@ Le contrat financier entre en vigueur à la date de signature de la dernière de
 ]
 
 #mention[
-Le contrat financier couvrira la période #footnote[Cette période comprend les composantes physique et virtuelle de la mobilité, comme indiqué dans l’annexe, et les jours de voyage (voir l’annexe pour un calendrier détaillé).] allant du #custom_data(date_debut)  au #custom_data(date_fin) (date depart / date retour)
-Dont #custom_data(duree_voyage) jours de voyage
+Le contrat financier couvrira la période #footnote[Cette période comprend les composantes physique et virtuelle de la mobilité, comme indiqué dans l’annexe, et les jours de voyage (voir l’annexe pour un calendrier détaillé).] allant du #custom_data(date_debut)  au #custom_data(date_fin) (date de départ / date de retour) dont #custom_data(duree_voyage) jours de voyage.
 ]
 
 #article[Soutien financier]
@@ -192,7 +193,7 @@ Le soutien financier total pour la période de mobilité est de #custom_data(val
 ]
 
 #mention[
-Le participant peut présenter une demande de prolongation de la période de mobilité physique dans la limite fixée dans le Guide du Programme Erasmus+: #custom_data(limite_prolongation) jours #footnote[À compléter par le bénéficiaire en concordance avec les règles du Guide du Programme Erasmus+.]
+Le participant peut présenter une demande de prolongation de la période de mobilité physique dans la limite fixée dans le Guide du Programme Erasmus+, soit : #custom_data(limite_prolongation) jours #footnote[À compléter par le bénéficiaire en concordance avec les règles du Guide du Programme Erasmus+.]
 
 Si l’organisation accepte de prolonger la période de mobilité par écrit, le contrat financier sera modifié en conséquence.	
 ]
@@ -324,7 +325,7 @@ Le participant doit effectuer le test de langue OLS dans les délais définis pa
 	+ des erreurs substantielles, des irrégularités ou des fraudes, ou
 	+ un manquement grave aux obligations découlant du présent contrat ou au cours de son attribution (y compris la mise en œuvre incorrecte de l’action, la soumission de fausses informations, le manquement à l’obligation de fournir les informations requises, la violation des règles éthiques (le cas échéant), etc.).]
 
-#mention[Lorsque les circonstances permettent la reprise de la mise en œuvre du contrat, les parties doivent immédiatement convenir de la date de reprise (un jour après la date de fin de la suspension). La suspension sera #strong[levée] à compter de la date de fin de la suspension.]
+#mention[Lorsque les circonstances permettent la reprise de la mise en œuvre du contrat, les parties doivent immédiatement convenir de la date de reprise (un jour après la date de fin de la suspension). La suspension sera levée à compter de la date de fin de la suspension.]
 
 #mention[Pendant la suspension, aucun soutien financier ne sera versé au participant.]
 
@@ -389,8 +390,10 @@ Le participant doit effectuer le test de langue OLS dans les délais définis pa
   ("Organisme d’envoi", envoi_direction_nom, envoi_direction_prenom, organisme_envoi_nom,
     organisme_envoi_representant_fonction),
   ("Participant", participant_nom, participant_premier_prenom),
-// tuteur légal seulement pour un participant mineur (nom renseigné)
-) + if tuteur_1_nom != missing_data { (("Tuteur légal", tuteur_1_nom, tuteur_1_prenom),) } else { () },
+// tuteur(s) légal(aux) seulement pour un participant mineur : l'un ou l'autre signe (« ou »)
+) + if tuteur_1_nom == missing_data { () }
+  else if tuteur_2_nom == missing_data { (("Tuteur légal", tuteur_1_nom, tuteur_1_prenom),) }
+  else { ((("Tuteur légal 1", tuteur_1_nom, tuteur_1_prenom), ("Tuteur légal 2", tuteur_2_nom, tuteur_2_prenom)),) },
 activate_translation: false)
 
 
