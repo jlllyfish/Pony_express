@@ -22,8 +22,8 @@ GRIST_PDF_COLUMN = None
 
 # Tables OTP de la démarche de groupe, reliées par le numéro de dossier
 DEMARCHE = "156967"
-GRIST_TABLE = os.environ.get("GRIST_TABLE_GROUPE", f"Demarche_{DEMARCHE}_annotations")  # table principale
-TABLE_CHAMPS = f"Demarche_{DEMARCHE}_champs"
+GRIST_TABLE = os.environ.get("GRIST_TABLE_GROUPE", f"Demarche_{DEMARCHE}_champs")  # table principale
+TABLE_ANNOTATIONS = f"Demarche_{DEMARCHE}_annotations"
 TABLE_ACTIVITES = f"Demarche_{DEMARCHE}_repetable_description_des_activites_et_des_acquis_d_apprentissage"
 TABLE_ETABLISSEMENTS = "Etablissements"
 BLOCK_KEY = "dossier_number"
@@ -40,54 +40,53 @@ TEMPLATE_FOLDERNAME = "contrat_pedagogique_groupe"
 # Un paramètre déclaré nulle part s'affiche « [donnée manquante] ».
 # =====================================================================
 
-# Table principale (GRIST_TABLE)
+# Table principale (GRIST_TABLE = table champs : une ligne par dossier)
 PRINCIPALE = {
     "numero_dossier": "dossier_number",
-    "code_projet": "code_projet",
+    "etablissement": "votre_etablissement",  # valeur = ref_etab_DN
+    # accompagnateur référent
+    "ref_nom": "nom_accompagnateur_referent",
+    "ref_prenom": "prenom_accompagnateur_referent",
+    "ref_email": "mail_accompagnateur_referent",
+    "ref_telephone": "telephone_accompagnateur_referent",
+    "ref_fonction": "intitule_du_poste_accompagnateur_referent",
+    # profil du groupe
+    "nb_apprenants": "nombre_d_apprenants_total",
+    "nb_filles": "nombre_de_filles",
+    "age_moyen": "age_moyen_des_apprenants",
+    "profil_texte": "profil_des_participants",
+    "liste_participants": "liste_des_participants",  # un participant par ligne
+    "calendrier_texte": "calendrier",  # « Jour 1: ... » une ligne par étape
+    "date_debut": "date_debut_activite_hors_jours_de_voyage",
+    "date_fin": "date_fin_activite_hors_jours_de_voyage",
+    "pays": "pays_d_accueil_nom",
+    "pays_libelle": "pays_d_accueil",  # « Italie (IT) »
+    "ville": "ville_pays_d_accueil",
+    # autre personne de contact de l'organisme d'envoi
+    "contact_envoi_nom": "nom",
+    "contact_envoi_prenom": "prenom",
+    "contact_envoi_fonction": "intitule_du_poste",
+    "contact_envoi_email": "mail",
+    "contact_envoi_telephone": "numero_de_telephone",
+    # organisme d'accueil et son responsable
+    "organisation_accueil_nom": "nom_de_l_organisme_d_accueil",
+    "accueil_resp_nom": "nom_responsable_organisme_d_accueil",
+    "accueil_resp_prenom": "prenom_responsable_organisme_d_accueil",
+    "accueil_resp_fonction": "intitule_du_poste_1",
+    "accueil_resp_email": "mail_responsable_organisme_d_accueil",
+    "accueil_resp_telephone": "telephone_responsable_organisme_d_accueil",
 }
 
 # Tables jointes : une ligne par dossier
 JOINTES = {
-    TABLE_CHAMPS: {
-        "etablissement": "votre_etablissement",  # valeur = ref_etab_DN
-        # accompagnateur référent
-        "ref_nom": "nom_accompagnateur_referent",
-        "ref_prenom": "prenom_accompagnateur_referent",
-        "ref_email": "mail_accompagnateur_referent",
-        "ref_telephone": "telephone_accompagnateur_referent",
-        "ref_fonction": "intitule_du_poste_accompagnateur_referent",
-        # profil du groupe
-        "nb_apprenants": "nombre_d_apprenants_total",
-        "nb_filles": "nombre_de_filles",
-        "age_moyen": "age_moyen_des_apprenants",
-        "profil_texte": "profil_des_participants",
-        "liste_participants": "liste_des_participants",  # un participant par ligne
-        "calendrier_texte": "calendrier",  # « Jour 1: ... » une ligne par étape
-        "date_debut": "date_debut_activite_hors_jours_de_voyage",
-        "date_fin": "date_fin_activite_hors_jours_de_voyage",
-        "pays": "pays_d_accueil_nom",
-        "pays_libelle": "pays_d_accueil",  # « Italie (IT) »
-        "ville": "ville_pays_d_accueil",
-        # autre personne de contact de l'organisme d'envoi
-        "contact_envoi_nom": "nom",
-        "contact_envoi_prenom": "prenom",
-        "contact_envoi_fonction": "intitule_du_poste",
-        "contact_envoi_email": "mail",
-        "contact_envoi_telephone": "numero_de_telephone",
-        # organisme d'accueil et son responsable
-        "organisation_accueil_nom": "nom_de_l_organisme_d_accueil",
-        "accueil_resp_nom": "nom_responsable_organisme_d_accueil",
-        "accueil_resp_prenom": "prenom_responsable_organisme_d_accueil",
-        "accueil_resp_fonction": "intitule_du_poste_1",
-        "accueil_resp_email": "mail_responsable_organisme_d_accueil",
-        "accueil_resp_telephone": "telephone_responsable_organisme_d_accueil",
+    TABLE_ANNOTATIONS: {
+        "code_projet": "code_projet",
     },
 }
 
 # Table de blocs répétables : une ligne par activité
-#   activite : 1re ligne = titre si le texte en compte plusieurs, le reste = méthodes et tâches
 BLOCS = {
-    "activites": (TABLE_ACTIVITES, {"activite": "activite", "acquis": "acquis"}),
+    "activites": (TABLE_ACTIVITES, {"titre": "titre_de_l_activite", "activite": "activite", "acquis": "acquis"}),
 }
 
 # Tables de référence : UNE ligne choisie pour le dossier
@@ -211,11 +210,11 @@ def etape(ligne: str) -> tuple[str, str]:
 def activite(block: dict) -> dict:
     """
     Bloc répétable -> {titre, methodes, acquis}.
-    activite : 1re ligne = titre si le texte en compte plusieurs ; le reste, coupé à la saisie, est
-               recollé en un paragraphe. acquis : une puce par élément séparé par « ; ».
+    titre : colonne titre_de_l_activite. activite : texte coupé à la saisie, recollé en un paragraphe.
+    acquis : une puce par élément séparé par « ; ».
     """
-    texte = lignes(clean_text(block.get("activite")))
-    titre, methodes = (texte[0], texte[1:]) if len(texte) > 1 else ("", texte)
+    titre = " ".join(lignes(clean_text(block.get("titre_de_l_activite"))))
+    methodes = lignes(clean_text(block.get("activite")))
     acquis = [a.strip() for a in " ".join(lignes(clean_text(block.get("acquis")))).split(";") if a.strip()]
     acquis = [a[0].upper() + a[1:] for a in acquis]  # majuscule en début de puce
     fiche = {"methodes": " ".join(methodes), "acquis": acquis if len(acquis) > 1 else " ".join(acquis)}
