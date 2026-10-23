@@ -8,6 +8,9 @@
 // texte sur plusieurs lignes (liste de lignes) : une puce par ligne
 #let puces(lignes) = if type(lignes) == array { list(tight: true, ..lignes) } else { lignes }
 
+// texte sur plusieurs lignes : un paragraphe par ligne
+#let paragraphes(lignes) = if type(lignes) == array { lignes.map(l => par(l)).join() } else { lignes }
+
 // fiche personne : nom, intitulé du poste, mail, téléphone
 #let personnes(liste, prefixe) = forms(title_key: "Titre",
   liste.enumerate().map(((i, p)) => (
@@ -88,7 +91,7 @@
   ))
 
   === Profil des participants
-  #puces(profil_participants)
+  #paragraphes(profil_participants)
 ]
 
 = Accompagnateurs et contacts
@@ -115,7 +118,7 @@
     #if i > 0 { v(12pt) }
     #block(breakable: false)[
       #block(above: 14pt, below: 8pt)[
-        #text(10pt, weight: "bold", fill: navy)[Activité #(i + 1) : #a.at("titre", default: missing_data)]
+        #text(10pt, weight: "bold", fill: navy)[Activité #(i + 1)#if "titre" in a [ : #a.titre]]
         #h(5pt) #text(8.5pt, en[Activity #(i + 1)])
       ]
       #role_title("Méthodes et tâches")
