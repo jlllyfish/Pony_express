@@ -50,6 +50,7 @@
   numero_assurance: missing_data,
   police_assurance: missing_data,
   option_prise_en_charge: missing_data,
+  option_libelle: missing_data,
   inclut_dans_contribution: (),
   ..superfluous_arguments
  ) = [
@@ -198,30 +199,28 @@ Le participant peut présenter une demande de prolongation de la période de mob
 Si l’organisation accepte de prolonger la période de mobilité par écrit, le contrat financier sera modifié en conséquence.	
 ]
 
+// option choisie dans DN (libellé affiché en gras), puis le texte correspondant
 #mention[
-
-  #if (option_prise_en_charge == "Option 1") [
-    L’organisme fournira au participant le soutien requis sous la forme d’un paiement de #custom_data(montant_global) euros.
-  ] else if (option_prise_en_charge == "Option 2") [
-    L’organisme accordera au participant le soutien requis sous la forme d’une contribution en nature. L’organisme doit s’assurer que cette prestation fournie répond aux normes de qualité et de sécurité nécessaires.
-
+  #let reliquat = [
     L’organisme s’assurera que la contribution en nature répond aux normes de qualité et de sécurité nécessaires.
+
+    En cas de reliquat mineur sur le poste de dépense fourni par l’organisme sous la forme d’une contribution en nature, celui-ci décide de verser le montant du reliquat au participant.
+  ]
+
+  #if option_prise_en_charge == "Option 1" [
+    #custom_data(option_libelle). L’organisme fournira au participant le soutien requis sous la forme d’un paiement de #custom_data(montant_global) euros.
+  ] else if option_prise_en_charge == "Option 2" [
+    #custom_data(option_libelle). L’organisme accordera au participant le soutien requis sous la forme d’une contribution en nature. L’organisme doit s’assurer que cette prestation fournie répond aux normes de qualité et de sécurité nécessaires.
+  ] else if option_prise_en_charge == "Option 3 transport" [
+    #custom_data(option_libelle). L’organisme fournira au participant le soutien requis sous la forme d’un paiement du montant suivant : #custom_data(frais_sejour) euros et sous la forme d’une contribution en nature pour les frais de transport.
+
+    #reliquat
+  ] else if option_prise_en_charge == "Option 3 sejour" [
+    #custom_data(option_libelle). L’organisme fournira au participant le soutien requis sous la forme d’un paiement du montant suivant : #custom_data(frais_voyage) euros et sous la forme d’une contribution en nature pour les frais de séjour.
+
+    #reliquat
   ] else [
-    L’organisme fournira au participant le soutien requis sous la forme d’un paiement du montant suivant : #custom_data(montant_bourse) euros et sous la forme d’une contribution en nature :
-
-    #let contribution_options = (
-      frais_voyage: "les frais de voyage",
-      soutien_individuel: "le soutien individuel",
-      soutien_linguistique: "le soutien linguistique",
-      frais_cours: "les frais de cours",
-      soutien_inclusion: "le soutien pour l’inclusion"
-    )
-
-    #for option in inclut_dans_contribution [
-      - #custom_data(contribution_options.at(option))
-    ]
-
-  L’organisme s’assurera que la contribution en nature répond aux normes de qualité et de sécurité nécessaires.
+    Modalité de prise en charge : #custom_data(missing_data)
   ]
 ]
 

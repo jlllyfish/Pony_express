@@ -174,10 +174,19 @@ def apply_data_transformation(data: dict) -> dict:
         transformed["valeur_bourse"] = transformed["montant_bourse"]
         transformed["montant_global"] = transformed["montant_bourse"]
 
-    # « Option 1 : ... » -> "Option 1" (valeur testée par le template)
-    option = re.search(r"option\s*(\d)", value(data, "option_prise_en_charge"), re.IGNORECASE)
+    # menu à choix simple de DN : libellé affiché en gras + code testé par le template
+    #   "Option 1", "Option 2", "Option 3 transport" (transport pris en charge par l'EPL),
+    #   "Option 3 sejour" (frais de séjour pris en charge par l'EPL)
+    libelle = value(data, "option_prise_en_charge")
+    transformed.pop("option_prise_en_charge", None)
+    option = re.search(r"option\s*(\d)", libelle, re.IGNORECASE)
     if option:
-        transformed["option_prise_en_charge"] = f"Option {option.group(1)}"
+        transformed["option_libelle"] = libelle
+        code = f"Option {option.group(1)}"
+        if code == "Option 3":
+            sans_accents = libelle.lower().replace("é", "e")
+            code += " transport" if "transport" in sans_accents else " sejour" if "sejour" in sans_accents else ""
+        transformed["option_prise_en_charge"] = code
 
     transformed.update(CONSTANTES)
     transformed["inclut_dans_contribution"] = []  # pas encore dans Grist
