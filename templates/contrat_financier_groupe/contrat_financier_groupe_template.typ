@@ -4,7 +4,7 @@
 // Contrat financier Erasmus+ pour les mobilités de groupe (démarche 156967)
 // signé par l'établissement d'envoi et par l'ENSFEA, coordonnateur du consortium
 
-#let euros(v) = if v == missing_data { custom_data(v) } else { [#v €] }
+#let euros(v) = if v == missing_data { text(7pt, custom_data(v)) } else { [#v €] }
 
 #let contrat_financier_groupe(
   code_projet: missing_data,
@@ -35,7 +35,7 @@
   frais_voyage: missing_data,
   // une ligne par participant : (nom, statut, frais de séjour, frais de voyage, total)
   participants_frais: ((missing_data, missing_data, missing_data, missing_data, missing_data),),
-  limite_prolongation: "0",
+  limite_prolongation: "0",  // en dur
   accompte_pourcentage: "80",
   option_prise_en_charge: missing_data,
   option_libelle: missing_data,
@@ -163,14 +163,15 @@ L’établissement recevra un soutien financier des fonds européens Erasmus+ po
 Le soutien financier total pour la période de mobilité est de #custom_data(valeur_bourse) euros, ce qui correspond à la somme de #custom_data(frais_sejour) euros pour les frais de séjour et #custom_data(frais_voyage) euros pour les frais de voyage.
 ]
 
-// frais destinés aux participants : une ligne par personne, puis les totaux (tableau insécable)
-#block(above: 10pt, below: 14pt, breakable: false)[
+// frais destinés aux participants : une ligne par personne, puis les totaux
+// (l'en-tête se répète si le tableau continue sur la page suivante)
+#block(above: 10pt, below: 14pt)[
   #let droite(v) = align(right, euros(v))
   #tableau(
     ("Nom et prénom du participant", "Statut du participant", "Frais de séjour", "Frais de voyage", "Total bourse"),
     participants_frais.map(((nom, statut, sejour, voyage, total)) => (nom, statut, droite(sejour), droite(voyage), droite(total)))
       + ((strong[Totaux], [], align(right, strong(euros(frais_sejour))), align(right, strong(euros(frais_voyage))), align(right, strong(euros(valeur_bourse)))),),
-    columns: (1fr, auto, auto, auto, auto),
+    columns: (1fr, 20%, 14%, 14%, 14%),
     activate_translation: false,
   )
 ]
