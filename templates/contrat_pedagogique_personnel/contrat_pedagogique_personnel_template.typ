@@ -215,13 +215,15 @@
 == Personnes responsables au sein de l’organisme d’envoi
 
 #chap(level: 2)[
-  #forms(title_key: "Responsabilités", responsables_envoi.map(personne => (
-    "Nom": personne.nom,
-    "Prénom":personne.prenom,
-    "Adresse mail":personne.email,
-    "Téléphone":personne.telephone,
-    "Responsabilités":personne.responsabilites,
-  )))
+  // le tuteur n'a que son nom dans DN : seules les informations renseignées sont affichées
+  #forms(title_key: "Responsabilités", responsables_envoi.map(personne => {
+    let fiche = ("Nom": personne.at("nom", default: missing_data))
+    for (cle, libelle) in (("prenom", "Prénom"), ("email", "Adresse mail"), ("telephone", "Téléphone"), ("fonction", "Fonction")) {
+      if cle in personne { fiche.insert(libelle, personne.at(cle)) }
+    }
+    fiche.insert("Responsabilités", personne.responsabilites)
+    fiche
+  }))
 ]
 
 = Évaluation des acquis d’apprentissage
