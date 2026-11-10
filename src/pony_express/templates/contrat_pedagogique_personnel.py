@@ -46,6 +46,8 @@ PRINCIPALE = {
     "participant_prenom": "prenom",
     "participant_qualification": "statut_du_participant",
     "participant_adresse": "adresse_du_participant",
+    "participant_email": "adresse_electronique",
+    "participant_telephone": "numero_de_telephone",
     "date_debut": "date_debut_activite_hors_jours_de_voyage",
     "date_fin": "date_fin_activite_hors_jours_de_voyage",
     "pays": "pays_d_accueil",
@@ -77,6 +79,7 @@ PRINCIPALE = {
     # organisme d'accueil : responsable, puis contact administratif / tuteur / contact d'urgence
     "accueil_resp_nom": "nom_responsable_organisme_d_accueil",
     "accueil_resp_prenom": "prenom_responsable_organisme_d_accueil",
+    "accueil_resp_fonction": "fonction_responsable_organisme_d_accueil",
     "accueil_resp_email": "mail_responsable_organisme_d_accueil",
     "accueil_resp_telephone": "numero_de_telephone_responsable_organisme_d_accueil",
     "accueil_resp_est_contact": "la_personne_responsable_de_l_organisme_d_accueil_est_egalement_la_personne_contact_administratif",
@@ -87,6 +90,7 @@ PRINCIPALE = {
     "accueil_tuteur_est_urgence": "le_tuteur_de_l_organisme_d_accueil_est_egalement_le_contact_d_urgence",
     "accueil_contact_nom": "nom_contact_administratif_1",
     "accueil_contact_prenom": "prenom_contact_administratif_1",
+    "accueil_contact_fonction": "fonction_contact_administratif_1",
     "accueil_contact_email": "mail_contact_administratif_1",
     "accueil_contact_telephone": "telephone_contact_administratif",
     "accueil_tuteur_nom": "nom_tuteur_1",
@@ -148,7 +152,6 @@ RESPONSABLES_ACCUEIL = [
                            "accueil_tuteur_est_urgence"), "accueil_urgence"),
 ]
 
-# Pas encore dans Grist (-> « [donnée manquante] ») : participant_email, participant_telephone
 # Calculés dans apply_data_transformation : pays_ville, duree, participant_premier_prenom,
 #   planning, responsables_envoi, responsables_accueil, signatures
 
