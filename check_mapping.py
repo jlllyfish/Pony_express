@@ -188,6 +188,22 @@ def main():
 
     cache = {}
 
+    def appel(fn, *args, **kwargs):
+        """Appel Grist : réessaie 3 fois si le serveur répond 5xx (502, 503...) ; (code, None) si erreur 4xx."""
+        import time
+        from requests.exceptions import HTTPError
+        for essai in range(4):
+            try:
+                return fn(*args, **kwargs)
+            except HTTPError as err:
+                code = err.response.status_code if err.response is not None else 0
+                if code < 500 or essai == 3:
+                    if code >= 500:
+                        raise
+                    return code, None
+                print(f"  … Grist a répondu {code}, nouvel essai dans {2 * (essai + 1)} s")
+                time.sleep(2 * (essai + 1))
+
     def table_info(table):
         """(IDs de colonnes, {libellé: ID}, lignes), ou None si la table est introuvable."""
         if table not in cache:
@@ -195,11 +211,11 @@ def main():
                 rows = offline_tables.get(table)
                 cache[table] = None if rows is None else (set().union(set(), *(r.keys() for r in rows)) - {"id"}, {}, rows)
             else:
-                st, cols = svc.grist.list_cols(table, hidden=True)
+                st, cols = appel(svc.grist.list_cols, table, hidden=True)
                 if st != 200:
                     cache[table] = None
                 else:
-                    st, rows = svc.grist.list_records(table)
+                    st, rows = appel(svc.grist.list_records, table)
                     cache[table] = ({c["id"] for c in cols},
                                     {c["fields"].get("label", ""): c["id"] for c in cols},
                                     rows if st == 200 else [])
