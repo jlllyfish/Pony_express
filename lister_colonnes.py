@@ -1,4 +1,4 @@
-"""
+r"""
 Liste les colonnes (identifiant + libellé) des tables Grist utiles au mapping, dans colonnes_grist.txt.
 
 Usage (PowerShell, depuis le dossier du projet) :
