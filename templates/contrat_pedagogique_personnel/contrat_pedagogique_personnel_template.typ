@@ -51,6 +51,8 @@
     fonction: missing_data,
     responsabilites: missing_data),
   ),
+  // accompagnement d'apprenants (type de mobilité « Accompagnateur ») : (nb:, periode:, periode_apprenants:)
+  accompagnement: none,
   // planning : une ligne par jour (jour, matin, après-midi)
   planning: ((missing_data, missing_data, missing_data),),
   evaluation_format: missing_data,
@@ -152,6 +154,15 @@
     "Titre qualification / profession": participant_qualification,
     "Format de mobilité": format_mobilite,
   ),wide_title: true)
+
+  #if accompagnement != none [
+    === Accompagnement d’apprenants
+    #form((
+      "Nombre d’apprenants accompagnés": accompagnement.nb,
+      "Période d’accompagnement": accompagnement.periode,
+      "Période d’activité des apprenants": accompagnement.periode_apprenants,
+    ), wide_title: true)
+  ]
 
 ]
 = Acquis d’apprentissage

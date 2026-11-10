@@ -50,6 +50,12 @@ PRINCIPALE = {
     "participant_telephone": "numero_de_telephone",
     "date_debut": "date_debut_activite_hors_jours_de_voyage",
     "date_fin": "date_fin_activite_hors_jours_de_voyage",
+    # accompagnement d'apprenants (type de mobilité « Accompagnateur »)
+    "accomp_debut": "date_de_debut_de_l_accompagnement",
+    "accomp_fin": "date_de_fin_de_l_accompagnement",
+    "accomp_nb_apprenants": "nombre_d_apprenants_a_accompagner",
+    "accomp_apprenants_debut": "date_de_debut_d_activite_des_apprenants",
+    "accomp_apprenants_fin": "date_de_fin_d_activite_des_apprenants",
     "pays": "pays_d_accueil",
     "ville": "ville_du_pays_d_accueil",
     "evaluation_format": "format_et_procedures_d_evaluation",
@@ -215,6 +221,15 @@ def apply_data_transformation(data: dict) -> dict:
     set_date(transformed, "date_debut")
     set_date(transformed, "date_fin")
     set_duree(transformed, "duree", "date_debut", "date_fin")
+    # rubrique « Accompagnement d'apprenants » seulement pour un accompagnateur
+    if value(data, "type_activite").casefold().startswith("accompagnat"):
+        for key in ("accomp_debut", "accomp_fin", "accomp_apprenants_debut", "accomp_apprenants_fin"):
+            set_date(transformed, key)
+        transformed["accompagnement"] = {
+            "nb": value(data, "accomp_nb_apprenants") or "[donnée manquante]",
+            "periode": periode(transformed, "accomp_debut", "accomp_fin"),
+            "periode_apprenants": periode(transformed, "accomp_apprenants_debut", "accomp_apprenants_fin"),
+        }
     # champ « adresse » de DN : objet JSON -> libellé lisible
     adresse = adresse_lisible(value(data, "participant_adresse"))
     if adresse:
@@ -398,6 +413,13 @@ def is_true(row: dict, key: str) -> bool:
     if isinstance(raw, bool):
         return raw
     return value(row, key).lower() in ("true", "vrai", "oui", "yes", "1")
+
+
+def periode(data: dict, debut: str, fin: str) -> str:
+    """« du 19.10.2026 au 23.10.2026 » (dates déjà passées par set_date) ; manquante si une date l'est."""
+    if debut in data and fin in data:
+        return f"du {data[debut]} au {data[fin]}"
+    return "[donnée manquante]"
 
 
 def adresse_lisible(texte: str) -> str:
