@@ -4,6 +4,8 @@
 
 #let contrat_financier(
   code_projet: missing_data,
+  // type de mobilité affiché en tête (ex : « MOBILITÉ DU PERSONNEL ») ; aucun pour les apprenants
+  mobilite: none,
   secteur: "Enseignement et formation professionnels",
   type_activite: missing_data,
   date_debut: missing_data,
@@ -65,7 +67,7 @@
 
 #let parts = if type(code_projet) == str { code_projet.split("-") } else { () }
 #couverture(
-  kicker: if parts.len() >= 5 [ERASMUS+ #h(3pt)·#h(3pt) #parts.at(3) #parts.at(4)] else [ERASMUS+],
+  kicker: [ERASMUS+ #if parts.len() >= 5 [#h(3pt)·#h(3pt) #parts.at(3) #parts.at(4)] #if mobilite != none [#h(3pt)·#h(3pt) #mobilite]],
   title: "Contrat financier Erasmus+ pour la mobilité des individus",
   participant: [#participant_premier_prenom #text(weight: "bold", participant_nom)],
   code: code_projet,

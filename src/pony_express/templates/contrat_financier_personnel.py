@@ -92,6 +92,7 @@ REFERENCES = {
 # Valeurs identiques pour tous les dossiers
 CONSTANTES = {
     "organisme_envoi_representant_fonction": "Directeur·rice",
+    "mobilite": "MOBILITÉ DU PERSONNEL",  # en tête de la page de garde
     "limite_prolongation": "89",   # article 3.3 (jours)
     "accompte_pourcentage": "80",  # article 5.1 (%)
 }
