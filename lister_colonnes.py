@@ -4,6 +4,7 @@ Liste les colonnes (identifiant + libellé) des tables Grist utiles au mapping, 
 Usage (PowerShell, depuis le dossier du projet) :
     .\lancer.ps1 -colonnes
     .\lancer.ps1 -colonnes -tables "Demarche_128447_annotations,Etablissements"
+    .\lancer.ps1 -colonnes -tables "Demarche_156966"     (toutes les tables qui commencent par ce nom)
 """
 import os
 import sys
@@ -19,6 +20,16 @@ DEFAUT = [
 
 tables = sys.argv[1].split(",") if len(sys.argv) > 1 and sys.argv[1] else DEFAUT
 grist = GristService(os.environ["GRIST_DOC_ID"], os.environ["GRIST_TEAM_SITE"], os.environ["GRIST_SERVER"]).grist
+
+# un nom incomplet (ex : Demarche_156966) = toutes les tables du document qui commencent par ce nom
+status, toutes = grist.list_tables()
+existantes = [t["id"] for t in toutes] if status == 200 else []
+etendues = []
+for table in tables:
+    table = table.strip()
+    trouvees = [t for t in existantes if t == table] or [t for t in existantes if t.startswith(table)]
+    etendues += trouvees or [table]
+tables = list(dict.fromkeys(etendues))
 
 lignes = []
 for table in tables:
