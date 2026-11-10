@@ -1,6 +1,8 @@
 param([string]$config = "contrat_pedagogique", [switch]$generer, [switch]$colonnes, [string]$tables = "")
 
 Set-Location $PSScriptRoot
+# le code du projet (src\pony_express) est trouvé sans installation préalable
+$env:PYTHONPATH = "$PSScriptRoot\src"
 Get-Content .env | Where-Object { $_ -match '^\s*[^#].*=' } | ForEach-Object {
     $k, $v = $_ -split '=', 2
     Set-Item "env:$($k.Trim())" $v.Trim()
