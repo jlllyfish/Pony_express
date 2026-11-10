@@ -5,7 +5,7 @@
 
 #let attestation_presence(
   code_projet: missing_data,
-  // type de mobilité (ex : « MOBILITÉ DU PERSONNEL ») : en-tête « ERASMUS+ · KA121 VET · … » comme les contrats
+  // type de mobilité (ex : « MOBILITÉ DU PERSONNEL ») : en-tête « ERASMUS+ · … »
   mobilite: none,
   date_debut: missing_data,
   date_fin: missing_data,
@@ -37,10 +37,7 @@
 )
 
 #couverture(
-  kicker: if mobilite != none {
-    let parts = if type(code_projet) == str { code_projet.split("-") } else { () }
-    [ERASMUS+ #if parts.len() >= 5 [#h(3pt)·#h(3pt) #parts.at(3) #parts.at(4)] #h(3pt)·#h(3pt) #mobilite]
-  } else [EUROPASS MOBILITÉ #h(3pt)·#h(3pt) EUROPASS MOBILITY],
+  kicker: if mobilite != none [ERASMUS+ #h(3pt)·#h(3pt) #mobilite] else [EUROPASS MOBILITÉ #h(3pt)·#h(3pt) EUROPASS MOBILITY],
   title: "Attestation de présence",
   translation: "Certificate of attendance",
   participant: [#participant_premier_prenom #text(weight: "bold", participant_nom)],
