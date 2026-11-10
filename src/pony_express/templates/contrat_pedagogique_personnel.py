@@ -1,3 +1,4 @@
+import json
 import os
 from copy import deepcopy
 from datetime import datetime
@@ -211,6 +212,10 @@ def apply_data_transformation(data: dict) -> dict:
     set_date(transformed, "date_debut")
     set_date(transformed, "date_fin")
     set_duree(transformed, "duree", "date_debut", "date_fin")
+    # champ « adresse » de DN : objet JSON -> libellé lisible
+    adresse = adresse_lisible(value(data, "participant_adresse"))
+    if adresse:
+        transformed["participant_adresse"] = adresse
     set_joined(transformed, "pays_ville", [value(data, "pays"), value(data, "ville")])
     # une puce par ligne saisie dans DN
     for key in ("evaluation_format", "evaluation_criteres"):
@@ -390,6 +395,21 @@ def is_true(row: dict, key: str) -> bool:
     if isinstance(raw, bool):
         return raw
     return value(row, key).lower() in ("true", "vrai", "oui", "yes", "1")
+
+
+def adresse_lisible(texte: str) -> str:
+    """Champ adresse de DN (JSON) -> « 44 Allées Charles de Fitte 31300 Toulouse » ; texte simple inchangé."""
+    if not texte.startswith("{"):
+        return texte
+    try:
+        adresse = json.loads(texte)
+    except ValueError:
+        return texte
+    label = (adresse.get("address") or {}).get("label")
+    if label:
+        return label
+    commune = adresse.get("commune") or {}
+    return " ".join(x for x in (commune.get("postalCode"), commune.get("name")) if x)
 
 
 def get_responsables_envoi(data: dict) -> list[dict]:
