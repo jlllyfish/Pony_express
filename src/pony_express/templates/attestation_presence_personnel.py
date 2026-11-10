@@ -98,6 +98,7 @@ def apply_data_transformation(data: dict) -> dict:
     set_joined(transformed, "pays_ville", [value(data, "pays"), value(data, "ville")])
     transformed["participant_premier_prenom"] = premier_prenom(value(data, "participant_prenom"))
     apply_references(transformed, data)
+    transformed["mobilite"] = "MOBILITÉ DU PERSONNEL"  # en-tête de la page de garde
     # la personne responsable de l'organisme d'accueil signe à la date de fin de stage
     if "date_fin" in transformed:
         transformed["date_signature_accueil"] = transformed["date_fin"]
