@@ -25,6 +25,7 @@ DEMARCHE = "156967"
 GRIST_TABLE = os.environ.get("GRIST_TABLE_GROUPE", f"Demarche_{DEMARCHE}_champs")  # table principale
 TABLE_ANNOTATIONS = f"Demarche_{DEMARCHE}_annotations"
 TABLE_ACTIVITES = f"Demarche_{DEMARCHE}_repetable_description_des_activites_et_des_acquis_d_apprentissage"
+TABLE_JOURS = f"Demarche_{DEMARCHE}_repetable_jour_d_activite"
 TABLE_ACCOMPAGNATEURS = f"Demarche_{DEMARCHE}_repetable_autre_s_accompagnateur_s"
 TABLE_ETABLISSEMENTS = "Etablissements"
 BLOCK_KEY = "dossier_number"
@@ -56,8 +57,9 @@ PRINCIPALE = {
     "nb_filles": "nombre_de_filles",
     "age_moyen": "age_moyen_des_apprenants",
     "profil_texte": "profil_des_participants",
-    "liste_participants": "liste_des_participants",  # un participant par ligne
-    "calendrier_texte": "calendrier",  # « Jour 1: ... » une ligne par étape
+    # un participant par ligne, dans chaque établissement
+    "participants_envoi": "liste_des_participants_de_l_etablissement_d_envoi",
+    "participants_accueil": "liste_des_participants_de_l_etablissement_d_accueil",
     "date_debut": "date_debut_activite_hors_jours_de_voyage",
     "date_fin": "date_fin_activite_hors_jours_de_voyage",
     "pays": "pays_d_accueil_nom",
@@ -88,6 +90,8 @@ JOINTES = {
 # Table de blocs répétables : une ligne par activité
 BLOCS = {
     "activites": (TABLE_ACTIVITES, {"titre": "titre_de_l_activite", "activite": "activite", "acquis": "acquis"}),
+    # calendrier : une ligne par jour d'activité (Jour 1, 2… dans l'ordre des blocs)
+    "calendrier": (TABLE_JOURS, {"matin": "matin", "apres_midi": "apres_midi"}),
     # autres accompagnateurs (après le référent)
     "accompagnants": (TABLE_ACCOMPAGNATEURS, {
         "nom": "nom", "prenom": "prenom", "fonction": "intitule_du_poste",
@@ -169,8 +173,14 @@ def apply_data_transformation(data: dict) -> dict:
     set_or_drop(transformed, "profil_participants", profil)
 
     envoi = transformed.get("organisation_envoi_nom", "")
-    set_or_drop(transformed, "participants", [(nom, envoi) for nom in lignes(value(data, "liste_participants"))])
-    set_or_drop(transformed, "calendrier", [etape(l) for l in lignes(value(data, "calendrier_texte"))])
+    accueil = transformed.get("organisation_accueil_nom", "")
+    set_or_drop(transformed, "participants",
+                [(nom, envoi) for nom in lignes(value(data, "participants_envoi"))]
+                + [(nom, accueil) for nom in lignes(value(data, "participants_accueil"))])
+    jours = get_blocks(TABLE_JOURS, data.get("numero_dossier"))
+    set_or_drop(transformed, "calendrier", [
+        (f"Jour {i}", " ".join(lignes(clean_text(j.get("matin")))), " ".join(lignes(clean_text(j.get("apres_midi")))))
+        for i, j in enumerate(jours, start=1)])
 
     # accompagnateur référent, puis les autres (répétable)
     _, colonnes = BLOCS["accompagnants"]
@@ -210,12 +220,6 @@ def apply_data_transformation(data: dict) -> dict:
 def lignes(texte: str) -> list[str]:
     """Texte multiligne -> lignes non vides, nettoyées."""
     return [l.strip() for l in texte.split("\n") if l.strip()]
-
-
-def etape(ligne: str) -> tuple[str, str]:
-    """« Jour 1: Visite... » -> ("Jour 1", "Visite...") ; sans « : », tout va dans l'activité."""
-    moment, sep, reste = ligne.partition(":")
-    return (moment.strip(), reste.strip()) if sep and len(moment) <= 30 else ("", ligne)
 
 
 def activite(block: dict) -> dict:

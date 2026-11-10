@@ -50,7 +50,7 @@ PRINCIPALE = {
     "pays": "pays_d_accueil_nom",
     "pays_libelle": "pays_d_accueil",  # « Italie (IT) »
     "ville": "ville_pays_d_accueil",
-    "liste_participants": "liste_des_participants",  # un apprenant par ligne
+    "liste_participants": "liste_des_participants_de_l_etablissement_d_envoi",  # un apprenant par ligne
     # accompagnateur référent (les autres : répétable)
     "ref_nom": "nom_accompagnateur_referent",
     "ref_prenom": "prenom_accompagnateur_referent",
@@ -64,11 +64,13 @@ PRINCIPALE = {
 JOINTES = {
     TABLE_ANNOTATIONS: {
         "code_projet": "code_projet",
-        # montants PAR APPRENANT (identiques pour tous les apprenants du dossier)
+        # montants PAR PERSONNE (identiques pour tous les apprenants / accompagnateurs du dossier)
         "duree_voyage": "nombre_de_jours_de_voyage",
-        "apprenant_voyage": "montant_frais_de_voyage",
-        "apprenant_sejour": "montant_frais_de_sejour",
-        "apprenant_bourse": "montant_bourse",
+        "voyage_participant": "montant_frais_de_voyage_par_participant",
+        "apprenant_sejour": "montant_frais_de_sejour_apprenant",
+        "apprenant_bourse": "montant_total_bourse_apprenant_voyage_sejour",
+        "accompagnateur_sejour": "montant_frais_de_sejour_accompagnateur",
+        "accompagnateur_bourse": "montant_total_bourse_accompagnateur_voyage_sejour",
     },
 }
 
@@ -101,7 +103,7 @@ CONSTANTES = {
 
 # Calculés dans apply_data_transformation :
 #   titre_activite, pays_ville, duree, duree_jours_bourse (= jours d'activité + jours de voyage),
-#   participants_frais (apprenants : montants des annotations ; accompagnateurs : [donnée manquante]),
+#   participants_frais (apprenants puis accompagnateurs, montants par personne des annotations),
 #   frais_sejour / frais_voyage / valeur_bourse (totaux, seulement si tous les montants sont connus),
 #   organisme_envoi_representant_nom_complet, option_prise_en_charge normalisée
 
@@ -150,14 +152,17 @@ def apply_data_transformation(data: dict) -> dict:
     except (KeyError, ValueError):
         transformed.pop("duree_jours_bourse", None)
 
-    # tableau des frais : apprenants (montants individuels des annotations), puis accompagnateurs
+    # tableau des frais : apprenants de l'établissement d'envoi, puis accompagnateurs
+    #   (montants par personne des annotations ; voyage identique pour tous)
     montants = {}
-    for cle in ("apprenant_sejour", "apprenant_voyage", "apprenant_bourse"):
+    for cle in ("voyage_participant", "apprenant_sejour", "apprenant_bourse", "accompagnateur_sejour", "accompagnateur_bourse"):
         set_montant(montants, cle, data)
-    sejour, voyage, bourse = (montants.get(c, MANQUANT) for c in ("apprenant_sejour", "apprenant_voyage", "apprenant_bourse"))
-    lignes_frais = [(nom, "Apprenant", sejour, voyage, bourse) for nom in lignes(value(data, "liste_participants"))]
+    voyage = montants.get("voyage_participant", MANQUANT)
+    apprenant = ("Apprenant", montants.get("apprenant_sejour", MANQUANT), voyage, montants.get("apprenant_bourse", MANQUANT))
+    accompagnant = ("Accompagnateur", montants.get("accompagnateur_sejour", MANQUANT), voyage, montants.get("accompagnateur_bourse", MANQUANT))
+    lignes_frais = [(nom, *apprenant) for nom in lignes(value(data, "liste_participants"))]
     for p in accompagnateurs(data):
-        lignes_frais.append((f"{p['nom'].upper()} {p.get('prenom', '')}".strip(), "Accompagnateur", MANQUANT, MANQUANT, MANQUANT))
+        lignes_frais.append((f"{p['nom'].upper()} {p.get('prenom', '')}".strip(), *accompagnant))
     if lignes_frais:
         transformed["participants_frais"] = lignes_frais
     # totaux seulement si tous les montants sont connus (sinon [donnée manquante])

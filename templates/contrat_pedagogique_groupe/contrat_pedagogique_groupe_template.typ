@@ -50,7 +50,8 @@
   accompagnants: ((nom: missing_data,),),
   contacts_envoi: (),
   contacts_accueil: ((nom: missing_data,),),
-  calendrier: ((missing_data, missing_data),),
+  // une ligne par jour : (jour, matin, après-midi)
+  calendrier: ((missing_data, missing_data, missing_data),),
   activites: ((titre: missing_data, methodes: missing_data, acquis: missing_data),),
   participants: ((missing_data, missing_data),),
   signature_envoi_nom: missing_data,
@@ -120,7 +121,7 @@
 
 = Calendrier des activités
 #chap[
-  #tableau(("Calendrier", "Session / activité"), calendrier, columns: (30%, 1fr))
+  #tableau(("Jour", "Matin", "Après-midi"), calendrier, columns: (14%, 1fr, 1fr))
 ]
 
 = Description des activités et des acquis d’apprentissage

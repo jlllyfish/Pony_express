@@ -16,12 +16,9 @@
     (nom: "Ruiz", prenom: "Javier", fonction: "Professeur de génie rural", email: "jruiz@ulsevilla.es", telephone: "+34 954 00 00 01"),
   ),
   calendrier: (
-    ("Jour 1 – 9h", "Accueil, présentation de l’établissement et du programme"),
-    ("Jour 2 – 9h", "Visite d’une exploitation en irrigation goutte-à-goutte"),
-    ("Jours 3 à 5", "Ateliers pratiques en serre avec les élèves espagnols"),
-    ("Jour 6", "Visite culturelle de Séville"),
-    ("Jours 7 à 10", "Projet commun : plan de gestion de l’eau d’une parcelle"),
-    ("Jour 11", "Restitution des projets, évaluation"),
+    ("Jour 1", "Accueil, présentation de l’établissement", "Visite d’une exploitation en goutte-à-goutte"),
+    ("Jour 2", "Ateliers pratiques en serre", "Cours avec les élèves espagnols"),
+    ("Jour 3", "Visite culturelle de Séville", "Projet commun : plan de gestion de l’eau"),
   ),
   activites: (
     (titre: "Irrigation économe en eau", methodes: ("Visite commentée d’exploitation", "Mesures de débit et calculs de besoins en eau"), acquis: ("Dimensionner un réseau goutte-à-goutte", "Comparer les pratiques françaises et espagnoles")),
