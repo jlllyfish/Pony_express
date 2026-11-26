@@ -29,7 +29,7 @@ TABLE_CHAMPS = f"Demarche_{DEMARCHE}_champs"
 TABLE_ACQUIS = f"Demarche_{DEMARCHE}_repetable_acquis_d_apprentissage"
 TABLE_ACTIVITES = f"Demarche_{DEMARCHE}_repetable_activites_et_taches"
 TABLE_ACCOMPAGNATEURS = (
-    f"Demarche_{DEMARCHE}_repetable_information_personnelle_accompagnateur"
+    f"Demarche_{DEMARCHE}_repetable_informations_personnelles_accompagnateur"
 )
 TABLE_ETABLISSEMENTS = "Etablissements"
 BLOCK_KEY = "dossier_number"  # numéro de dossier dans les tables de blocs
@@ -268,6 +268,7 @@ def apply_data_transformation(data: dict) -> dict:
             set_list(transformed, param, [block.get(columns) for block in blocks])
         else:
             set_people(transformed, param, blocks, columns)
+    transformed.setdefault("accompagnants", [])  # aucun accompagnateur : pas de section
     transformed.update(CONSTANTES)
     responsables = get_responsables_envoi(data)
     if responsables:

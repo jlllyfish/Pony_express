@@ -235,6 +235,8 @@
   )))
 ]
 
+// section affichée seulement s'il y a au moins un accompagnateur
+#if accompagnants.len() > 0 [
 = Accompagnateurs
 
 #chap[
@@ -254,6 +256,7 @@
     "Téléphone":personne.telephone,
     "Fonction":personne.at("fonction", default: missing_data),
   )))
+]
 ]
 
 = Évaluation des acquis d’apprentissage
