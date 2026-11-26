@@ -23,6 +23,7 @@
   "Date, lieu et signature": "Date, place and signature",
   "Début": "Start",
   "Destination": "Destination",
+  "Période": "Period",
   "Accompagnement d’apprenants": "Accompanying learners",
   "Nombre d’apprenants accompagnés": "Number of accompanied learners",
   "Période d’accompagnement": "Accompanying period",

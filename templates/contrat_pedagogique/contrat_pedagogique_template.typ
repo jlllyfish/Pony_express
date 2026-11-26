@@ -255,6 +255,7 @@
     "Adresse mail":personne.email,
     "Téléphone":personne.telephone,
     "Fonction":personne.at("fonction", default: missing_data),
+    "Période":personne.at("periode", default: missing_data),
   )))
 ]
 ]
@@ -294,15 +295,18 @@
   #englishStyling[The signatories confirm that they understood and approve the content of this agreement.]
   ]
 
-  #let tuteur(i, champ) = if tuteurs_legaux.len() > i {
-    tuteurs_legaux.at(i).at(champ)
-  } else { missing_data }
+  // tuteurs légaux renseignés seulement : aucun (majeur), un seul, ou l'un ou l'autre (« ou »)
+  #let tuteurs = tuteurs_legaux.map(t => (t.at("nom", default: missing_data), t.at("prenom", default: "")))
+  #let bloc_tuteurs = {
+    if tuteurs.len() == 0 { () }
+    else if tuteurs.len() == 1 { (("Tuteur légal", ..tuteurs.at(0)),) }
+    else { (tuteurs.enumerate().map(((i, t)) => ("Tuteur légal " + str(i + 1), ..t)),) }
+  }
 
   #signatures((
     ("Organisme d’envoi", signature_envoi_nom, signature_envoi_prenom, organisation_envoi_nom),
     ("Organisme d’accueil", signature_accueil_nom, signature_accueil_prenom, organisation_accueil_nom),
-    (("Tuteur légal 1", tuteur(0, "nom"), tuteur(0, "prenom")),
-     ("Tuteur légal 2", tuteur(1, "nom"), tuteur(1, "prenom"))),
+    ..bloc_tuteurs,
     ("Participant", participant_nom, signature_participant_prenom),
   ))
 ]

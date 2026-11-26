@@ -133,6 +133,8 @@ BLOCS = {
             "email": "adresse_electronique",
             "telephone": "numero_de_telephone",
             "fonction": "intitule_du_poste",
+            "du": "du",  # période d'accompagnement de la personne
+            "au": "au",
         },
     ),
 }
@@ -269,6 +271,12 @@ def apply_data_transformation(data: dict) -> dict:
         else:
             set_people(transformed, param, blocks, columns)
     transformed.setdefault("accompagnants", [])  # aucun accompagnateur : pas de section
+    for personne in transformed["accompagnants"]:
+        # « du 19.10.2026 au 30.10.2026 » ; une date manquante -> [donnée manquante]
+        set_date(personne, "du")
+        set_date(personne, "au")
+        if "du" in personne and "au" in personne:
+            personne["periode"] = f"du {personne['du']} au {personne['au']}"
     transformed.update(CONSTANTES)
     responsables = get_responsables_envoi(data)
     if responsables:
